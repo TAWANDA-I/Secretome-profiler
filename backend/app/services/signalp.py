@@ -56,7 +56,8 @@ async def classify_signal_peptides(
         keywords = entry.get("keywords", [])
 
         # Use UniProt annotation when available
-        if "Signal peptide" in keywords or any("Secreted" in loc for loc in locations):
+        # UniProt keyword for signal peptide is "Signal" (KW-0732)
+        if "Signal" in keywords or any("Secreted" in loc for loc in locations):
             results[acc] = {
                 "has_sp": True,
                 "type": "Sec/SPI",

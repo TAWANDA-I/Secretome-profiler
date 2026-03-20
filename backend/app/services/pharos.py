@@ -15,6 +15,7 @@ settings = get_settings()
 
 PHAROS_URL = "https://pharos-api.ncats.io/graphql"
 
+# Simplified query using only stable fields
 _QUERY = """
 query TargetsByUniprots($uniprots: [String]) {
   targets(filter: { uniprots: $uniprots }) {
@@ -24,8 +25,6 @@ query TargetsByUniprots($uniprots: [String]) {
       name
       tdl
       diseaseAssociationCount
-      ligandCounts { ligandCount }
-      dto { name }
     }
   }
 }
@@ -35,18 +34,20 @@ query TargetsByUniprots($uniprots: [String]) {
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 async def fetch_targets(proteins: list[str]) -> dict[str, Any]:
     """Returns {uniprot: pharos_target_info}."""
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=settings.http_timeout) as client:
         resp = await client.post(
             PHAROS_URL,
             json={"query": _QUERY, "variables": {"uniprots": proteins}},
             headers={"Content-Type": "application/json"},
-            timeout=settings.http_timeout,
         )
         resp.raise_for_status()
-        data = resp.json()
+        body = resp.json()
+
+    if "errors" in body:
+        logger.error("Pharos GraphQL errors: %s", body["errors"])
 
     results: dict[str, Any] = {}
-    for target in data.get("data", {}).get("targets", {}).get("targets", []):
+    for target in body.get("data", {}).get("targets", {}).get("targets", []):
         acc = target.get("uniprot", "")
         if acc:
             results[acc] = {
@@ -54,7 +55,5 @@ async def fetch_targets(proteins: list[str]) -> dict[str, Any]:
                 "name": target.get("name"),
                 "tdl": target.get("tdl"),
                 "disease_associations": target.get("diseaseAssociationCount", 0),
-                "ligand_count": target.get("ligandCounts", {}).get("ligandCount", 0),
-                "dto_class": (target.get("dto") or [{}])[0].get("name"),
             }
     return results
