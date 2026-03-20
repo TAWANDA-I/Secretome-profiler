@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for f:*)",
+      "Bash(do)",
+      "Read(//c/Users/michal/Desktop/AI_MI/Secretome profiler/**)",
+      "Bash(echo \"missing: $f\")",
+      "Bash(done)"
+    ]
+  }
+}

@@ -27,7 +27,7 @@ settings = get_settings()
 
 
 def _run(coro):
-    return asyncio.get_event_loop().run_until_complete(coro)
+    return asyncio.run(coro)
 
 
 async def _update_job(job_id: str, **kwargs) -> None:
