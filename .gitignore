@@ -56,6 +56,5 @@ htmlcov/
 .pytest_cache/
 coverage/
 
-# Alembic
-alembic/versions/*.py
-!alembic/versions/.gitkeep
+# Alembic — track migration files, ignore only pycache
+alembic/versions/__pycache__/
