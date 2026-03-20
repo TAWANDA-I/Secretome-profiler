@@ -14,7 +14,6 @@ from app.services import (
     gprofiler as gprofiler_svc,
     hpa as hpa_svc,
     minio_client,
-    pharos as pharos_svc,
     sasp as sasp_svc,
     signalp as signalp_svc,
     string_db as string_svc,
@@ -119,8 +118,6 @@ async def _execute_pipeline(job_id: str) -> None:
         parallel.append(_run_hpa(job_id, proteins, gene_names))
     if "signalp" in modules:
         parallel.append(_run_signalp(job_id, proteins, uniprot_data))
-    if "pharos" in modules:
-        parallel.append(_run_pharos(job_id, proteins))
     if "sasp" in modules:
         parallel.append(_run_sasp(job_id, proteins))
 
@@ -177,21 +174,6 @@ async def _run_signalp(job_id: str, proteins: list[str], uniprot_data: dict) -> 
     except Exception as e:
         await _set_module_progress(job_id, "signalp", "failed", 0, str(e))
 
-
-async def _run_pharos(job_id: str, proteins: list[str]) -> None:
-    await _set_module_progress(job_id, "pharos", "running", 0)
-    try:
-        data = await pharos_svc.fetch_targets(proteins)
-        summary = {
-            "tclin": sum(1 for v in data.values() if v.get("tdl") == "Tclin"),
-            "tchem": sum(1 for v in data.values() if v.get("tdl") == "Tchem"),
-            "tbio": sum(1 for v in data.values() if v.get("tdl") == "Tbio"),
-            "tdark": sum(1 for v in data.values() if v.get("tdl") == "Tdark"),
-        }
-        await _save_result(job_id, "pharos", data, summary)
-        await _set_module_progress(job_id, "pharos", "completed", 100)
-    except Exception as e:
-        await _set_module_progress(job_id, "pharos", "failed", 0, str(e))
 
 
 async def _run_sasp(job_id: str, proteins: list[str]) -> None:

@@ -6,16 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import type { ModuleName } from "@/types";
 
 const ALL_MODULES: ModuleName[] = [
-  "uniprot", "string", "gprofiler", "hpa", "signalp", "pharos", "sasp",
+  "uniprot", "string", "gprofiler", "hpa", "signalp", "sasp",
 ];
 
-const MODULE_LABELS: Record<ModuleName, string> = {
+const MODULE_LABELS: Record<string, string> = {
   uniprot:    "UniProt Annotation",
   string:     "STRING Network",
   gprofiler:  "Functional Enrichment",
   hpa:        "HPA Concentrations",
   signalp:    "Signal Peptide",
-  pharos:     "Pharos Drug Targets",
   sasp:       "SASP Flagging",
   comparison: "Two-Set Comparison",
 };

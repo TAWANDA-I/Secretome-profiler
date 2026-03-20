@@ -10,7 +10,6 @@ import { EnrichmentPanel } from "@/components/results/EnrichmentPanel";
 import { SaspPanel } from "@/components/results/SaspPanel";
 import { SignalpPanel } from "@/components/results/SignalpPanel";
 import { HpaPanel } from "@/components/results/HpaPanel";
-import { PharosPanel } from "@/components/results/PharosPanel";
 import { SummaryPanel } from "@/components/results/SummaryPanel";
 import type { Result } from "@/types";
 
@@ -21,7 +20,6 @@ const PANEL_MAP: Record<string, React.ComponentType<{ result: Result }>> = {
   sasp:      SaspPanel,
   signalp:   SignalpPanel,
   hpa:       HpaPanel,
-  pharos:    PharosPanel,
 };
 
 const TAB_LABELS: Record<string, string> = {
@@ -32,7 +30,6 @@ const TAB_LABELS: Record<string, string> = {
   sasp:      "SASP",
   signalp:   "SignalP",
   hpa:       "HPA",
-  pharos:    "Pharos",
   comparison: "Comparison",
 };
 

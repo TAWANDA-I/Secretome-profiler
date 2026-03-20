@@ -5,6 +5,8 @@ import { resultsApi } from "@/api/results";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Spinner } from "@/components/ui/Spinner";
+import { ProteinListModal } from "./ProteinListModal";
+import { useUniprotLookup } from "@/hooks/useUniprotLookup";
 import type { Result } from "@/types";
 
 interface GprofilerResult {
@@ -16,43 +18,36 @@ interface GprofilerResult {
   intersection_size: number;
   query_size: number;
   term_size: number;
-  genes: string[];
+  genes: string[][];   // intersections — list of gene lists, one per query
 }
 
-interface GprofilerData {
-  results: GprofilerResult[];
-}
+interface GprofilerData { results: GprofilerResult[]; }
 
 const SOURCE_COLORS: Record<string, string> = {
-  "GO:BP": "#0ea5e9",
-  "GO:MF": "#8b5cf6",
-  "GO:CC": "#10b981",
-  "KEGG": "#f59e0b",
-  "REAC": "#ef4444",
+  "GO:BP": "#0ea5e9", "GO:MF": "#8b5cf6", "GO:CC": "#10b981",
+  "KEGG": "#f59e0b",  "REAC": "#ef4444",
 };
-
 const SOURCE_LABELS: Record<string, string> = {
-  "GO:BP": "GO Biological Process",
-  "GO:MF": "GO Molecular Function",
-  "GO:CC": "GO Cellular Component",
-  "KEGG": "KEGG",
-  "REAC": "Reactome",
+  "GO:BP": "GO Biological Process", "GO:MF": "GO Molecular Function",
+  "GO:CC": "GO Cellular Component", "KEGG": "KEGG", "REAC": "Reactome",
 };
 
+interface ModalState { title: string; subtitle: string; genes: string[]; }
 interface Props { result: Result; }
 
 export function EnrichmentPanel({ result }: Props) {
-  const [activeSource, setActiveSource] = useState<string>("ALL");
+  const [activeSource, setActiveSource] = useState("ALL");
   const [search, setSearch] = useState("");
+  const [modal, setModal] = useState<ModalState | null>(null);
 
   const { data: raw, isLoading } = useQuery({
     queryKey: ["module-data", result.job_id, "gprofiler"],
     queryFn: () => resultsApi.getModuleData(result.job_id, "gprofiler"),
   });
+  const { toRows } = useUniprotLookup(result.job_id);
 
   const allTerms: GprofilerResult[] = useMemo(() => {
-    const d = raw as GprofilerData | undefined;
-    return d?.results ?? [];
+    return (raw as GprofilerData | undefined)?.results ?? [];
   }, [raw]);
 
   const sources = useMemo(
@@ -71,39 +66,60 @@ export function EnrichmentPanel({ result }: Props) {
 
   const top20 = filtered.slice(0, 20);
 
+  // Reversed list for chart (bottom-up display)
+  const chartTerms = useMemo(() => [...top20].reverse(), [top20]);
+
+  const openModal = (term: GprofilerResult) => {
+    // genes is [[geneA, geneB, ...]] for single-query g:Profiler
+    const geneList: string[] = Array.isArray(term.genes?.[0])
+      ? (term.genes[0] as unknown as string[])
+      : (term.genes ?? []);
+    setModal({
+      title: term.term_name,
+      subtitle: `${term.term_id} · ${SOURCE_LABELS[term.source] ?? term.source} · p = ${term.p_value.toExponential(2)}`,
+      genes: geneList,
+    });
+  };
+
   const chartOption = useMemo(() => ({
     tooltip: {
       trigger: "axis",
       axisPointer: { type: "shadow" },
       formatter: (params: { name: string; value: number }[]) => {
         const p = params[0];
-        return `${p.name}<br/>-log₁₀(p) = ${p.value.toFixed(2)}`;
+        return `${p.name}<br/>-log₁₀(p) = ${p.value.toFixed(2)}<br/><span style="color:#94a3b8;font-size:11px">Click to see proteins</span>`;
       },
     },
     grid: { left: 220, right: 30, top: 10, bottom: 30 },
     xAxis: { type: "value", name: "-log₁₀(p-value)" },
     yAxis: {
       type: "category",
-      data: [...top20].reverse().map((t) => t.term_name.slice(0, 40)),
+      data: chartTerms.map((t) => t.term_name.slice(0, 42)),
       axisLabel: { fontSize: 11 },
     },
     series: [{
       type: "bar",
-      data: [...top20].reverse().map((t) => ({
+      cursor: "pointer",
+      data: chartTerms.map((t) => ({
         value: parseFloat((-Math.log10(t.p_value)).toFixed(2)),
         itemStyle: { color: SOURCE_COLORS[t.source] ?? "#64748b" },
       })),
     }],
-  }), [top20]);
+  }), [chartTerms]);
+
+  const handleChartClick = (params: { dataIndex: number }) => {
+    const term = chartTerms[params.dataIndex];
+    if (term) openModal(term);
+  };
+
+  const handleRowClick = (term: GprofilerResult) => openModal(term);
 
   const handleDownload = () => {
     if (!raw) return;
     const blob = new Blob([JSON.stringify(raw, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `gprofiler_${result.job_id}.json`;
-    a.click();
+    const a = document.createElement("a"); a.href = url;
+    a.download = `gprofiler_${result.job_id}.json`; a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -111,6 +127,15 @@ export function EnrichmentPanel({ result }: Props) {
 
   return (
     <div className="space-y-4">
+      {modal && (
+        <ProteinListModal
+          title={modal.title}
+          subtitle={modal.subtitle}
+          proteins={toRows(modal.genes)}
+          onClose={() => setModal(null)}
+        />
+      )}
+
       <div className="grid grid-cols-2 gap-4">
         <Card className="text-center">
           <CardContent className="py-5">
@@ -128,16 +153,14 @@ export function EnrichmentPanel({ result }: Props) {
         </Card>
       </div>
 
-      {/* Source filter tabs */}
+      {/* Source filter */}
       <div className="flex gap-1 flex-wrap">
         {sources.map((src) => (
           <button
             key={src}
             onClick={() => setActiveSource(src)}
             className={`px-3 py-1 text-xs rounded-full font-medium transition-colors ${
-              activeSource === src
-                ? "text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              activeSource === src ? "text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
             style={activeSource === src ? { background: SOURCE_COLORS[src] ?? "#64748b" } : {}}
           >
@@ -152,28 +175,34 @@ export function EnrichmentPanel({ result }: Props) {
         <>
           {top20.length > 0 && (
             <Card>
-              <CardHeader><CardTitle>Top {top20.length} Enriched Terms</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle>Top {top20.length} Enriched Terms
+                  <span className="text-xs font-normal text-gray-400 ml-2">— click bar to see proteins</span>
+                </CardTitle>
+              </CardHeader>
               <CardContent>
-                <ReactECharts option={chartOption} style={{ height: Math.max(250, top20.length * 22) }} />
+                <ReactECharts
+                  option={chartOption}
+                  style={{ height: Math.max(260, top20.length * 22) }}
+                  onEvents={{ click: handleChartClick }}
+                />
               </CardContent>
             </Card>
           )}
 
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>All Significant Terms</CardTitle>
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <CardTitle>All Significant Terms
+                  <span className="text-xs font-normal text-gray-400 ml-2">— click row to see proteins</span>
+                </CardTitle>
                 <div className="flex gap-2">
                   <input
-                    type="text"
-                    placeholder="Search terms…"
-                    value={search}
+                    type="text" placeholder="Search terms…" value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="rounded border border-gray-300 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary-400"
                   />
-                  <button onClick={handleDownload} className="text-xs text-primary-600 hover:underline">
-                    ↓ JSON
-                  </button>
+                  <button onClick={handleDownload} className="text-xs text-primary-600 hover:underline">↓ JSON</button>
                 </div>
               </div>
             </CardHeader>
@@ -190,12 +219,13 @@ export function EnrichmentPanel({ result }: Props) {
                 </thead>
                 <tbody>
                   {filtered.slice(0, 200).map((t) => (
-                    <tr key={t.term_id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <tr
+                      key={t.term_id}
+                      onClick={() => handleRowClick(t)}
+                      className="border-b border-gray-100 hover:bg-blue-50 cursor-pointer"
+                    >
                       <td className="px-3 py-1.5">
-                        <Badge
-                          variant="secondary"
-                          style={{ background: SOURCE_COLORS[t.source] + "20", color: SOURCE_COLORS[t.source] }}
-                        >
+                        <Badge variant="secondary" style={{ background: SOURCE_COLORS[t.source] + "20", color: SOURCE_COLORS[t.source] }}>
                           {t.source}
                         </Badge>
                       </td>
@@ -203,14 +233,10 @@ export function EnrichmentPanel({ result }: Props) {
                         <span className="font-mono text-gray-400 mr-1">{t.term_id}</span>
                         {t.term_name}
                       </td>
-                      <td className="px-3 py-1.5 text-right font-mono text-gray-600">
-                        {t.p_value.toExponential(2)}
-                      </td>
+                      <td className="px-3 py-1.5 text-right font-mono text-gray-600">{t.p_value.toExponential(2)}</td>
                       <td className="px-3 py-1.5 text-right text-gray-600">{t.intersection_size}</td>
                       <td className="px-3 py-1.5 text-right text-gray-600">
-                        {t.query_size > 0
-                          ? `${((t.intersection_size / t.query_size) * 100).toFixed(1)}%`
-                          : "—"}
+                        {t.query_size > 0 ? `${((t.intersection_size / t.query_size) * 100).toFixed(1)}%` : "—"}
                       </td>
                     </tr>
                   ))}
