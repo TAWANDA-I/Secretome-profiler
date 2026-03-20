@@ -41,8 +41,7 @@ export default function Home() {
 
   const parseProteins = (text: string): string[] =>
     text
-      .split(/[,
-	\s]+/)
+      .split(/[,\n\t\s]+/)
       .map((s) => s.trim().toUpperCase())
       .filter(Boolean);
 
@@ -83,11 +82,7 @@ export default function Home() {
           <CardContent className="space-y-2">
             <textarea
               className="w-full h-40 rounded-md border border-gray-300 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
-              placeholder={"P05231
-P01375
-P01584
-...
-(paste UniProt accessions, one per line or comma-separated)"}
+              placeholder={"P05231\nP01375\nP01584\n...\n(paste UniProt accessions, one per line or comma-separated)"}
               value={raw}
               onChange={(e) => setRaw(e.target.value)}
             />
