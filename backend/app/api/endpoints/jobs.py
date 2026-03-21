@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.job import Job
 from app.schemas.job import JobCreate, JobRead, JobSummary
+from app.services import minio_client
 from app.workers.tasks import run_analysis_pipeline
 
 router = APIRouter()
@@ -53,4 +54,7 @@ async def delete_job(job_id: uuid.UUID, db: AsyncSession = Depends(get_db)) -> N
     job = result.scalar_one_or_none()
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found")
+    # Clean up MinIO objects before deleting the job record
+    await minio_client.delete_objects_by_prefix(f"jobs/{job_id}/")
     await db.delete(job)
+    await db.commit()

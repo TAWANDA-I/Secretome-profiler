@@ -2,6 +2,12 @@
 Signal peptide classification using BioPython + heuristics.
 Falls back to UniProt subcellular location data.
 No external SignalP server required.
+
+Classification types:
+  Sec/SPI       — classical signal peptide (UniProt keyword "Signal" or heuristic)
+  GPI-anchored  — GPI-anchor attachment (UniProt keyword "GPI-anchor")
+  Unconventional — secreted without classical signal (Secreted location, no signal/GPI)
+  Other         — no secretion evidence found
 """
 import logging
 import re
@@ -20,9 +26,8 @@ _MIN_H_STRETCH = 8
 def _heuristic_signal_peptide(sequence: str) -> dict:
     """Simple von Heijne-inspired heuristic on first 30 aa."""
     if not sequence:
-        return {"has_sp": False, "type": "Unknown", "confidence": 0.0}
+        return {"has_sp": False, "type": "Other", "confidence": 0.0}
 
-    n_region = sequence[:5]
     h_region = sequence[5:30]
     h_count = sum(1 for aa in h_region if aa in _HYDROPHOBIC)
     has_h_stretch = h_count >= _MIN_H_STRETCH
@@ -40,7 +45,7 @@ def _heuristic_signal_peptide(sequence: str) -> dict:
         sp_type = "Other"
         confidence = 0.8
 
-    return {"has_sp": sp_type != "Other", "type": sp_type, "confidence": round(confidence, 2)}
+    return {"has_sp": sp_type == "Sec/SPI", "type": sp_type, "confidence": round(confidence, 2)}
 
 
 async def classify_signal_peptides(
@@ -54,18 +59,41 @@ async def classify_signal_peptides(
         sequence = entry.get("sequence", "")
         locations = entry.get("subcellular_location", [])
         keywords = entry.get("keywords", [])
+        gene_name = entry.get("gene_name", "")
+        protein_name = entry.get("protein_name", "")
 
-        # Use UniProt annotation when available
-        # UniProt keyword for signal peptide is "Signal" (KW-0732)
-        if "Signal" in keywords or any("Secreted" in loc for loc in locations):
-            results[acc] = {
+        is_secreted = any("Secreted" in loc for loc in locations)
+        has_signal_kw = "Signal" in keywords
+        has_gpi_kw = "GPI-anchor" in keywords
+
+        if has_gpi_kw:
+            result = {
+                "has_sp": False,
+                "type": "GPI-anchored",
+                "confidence": 1.0,
+                "source": "uniprot",
+            }
+        elif has_signal_kw:
+            result = {
                 "has_sp": True,
                 "type": "Sec/SPI",
                 "confidence": 1.0,
                 "source": "uniprot",
             }
+        elif is_secreted:
+            # Secreted but no classical signal peptide keyword → unconventional secretion
+            result = {
+                "has_sp": False,
+                "type": "Unconventional",
+                "confidence": 0.9,
+                "source": "uniprot",
+            }
         else:
             pred = _heuristic_signal_peptide(sequence)
-            results[acc] = {**pred, "source": "heuristic"}
+            result = {**pred, "source": "heuristic"}
+
+        result["gene_name"] = gene_name
+        result["protein_name"] = protein_name
+        results[acc] = result
 
     return results

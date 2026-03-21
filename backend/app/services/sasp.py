@@ -54,7 +54,6 @@ SASP_UNIPROT_IDS: frozenset[str] = frozenset({
     "O14498",  # SPRR1A (placeholder)
     "P01042",  # Kininogen-1 (KNG1)
     "P00747",  # Plasminogen (PLG)
-    "P05155",  # C1-inhibitor (SERPING1)
     "P02647",  # ApoA-I
     "P02655",  # ApoC-II
     "P02649",  # ApoE
@@ -66,13 +65,26 @@ SASP_UNIPROT_IDS: frozenset[str] = frozenset({
 })
 
 
-def flag_sasp(proteins: list[str]) -> dict[str, Any]:
-    """Returns SASP flags for each protein."""
+def flag_sasp(proteins: list[str], uniprot_data: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Returns SASP flags for each protein, enriched with gene/protein names."""
+    uniprot_data = uniprot_data or {}
     flagged = {acc: acc in SASP_UNIPROT_IDS for acc in proteins}
     sasp_hits = [acc for acc, is_sasp in flagged.items() if is_sasp]
+
+    # Build enriched hit list with gene/protein names from uniprot_data
+    sasp_details = []
+    for acc in sasp_hits:
+        entry = uniprot_data.get(acc, {})
+        sasp_details.append({
+            "accession": acc,
+            "gene_name": entry.get("gene_name", ""),
+            "protein_name": entry.get("protein_name", ""),
+        })
+
     return {
         "flags": flagged,
         "sasp_hits": sasp_hits,
+        "sasp_details": sasp_details,
         "sasp_count": len(sasp_hits),
         "total": len(proteins),
         "fraction": round(len(sasp_hits) / len(proteins), 4) if proteins else 0.0,

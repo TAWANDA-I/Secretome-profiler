@@ -9,6 +9,7 @@ interface JobStore {
   error: string | null;
   fetchJobs: () => Promise<void>;
   createJob: (payload: JobCreate) => Promise<Job>;
+  deleteJob: (id: string) => Promise<void>;
   setCurrentJob: (job: Job | null) => void;
   clearError: () => void;
 }
@@ -42,6 +43,18 @@ export const useJobStore = create<JobStore>((set) => ({
       return job;
     } catch (err) {
       set({ error: String(err), loading: false });
+      throw err;
+    }
+  },
+
+  deleteJob: async (id) => {
+    // Optimistic update: remove immediately
+    set((s) => ({ jobs: s.jobs.filter((j) => j.id !== id) }));
+    try {
+      await jobsApi.delete(id);
+    } catch (err) {
+      // Roll back on failure
+      set((s) => ({ error: String(err) }));
       throw err;
     }
   },

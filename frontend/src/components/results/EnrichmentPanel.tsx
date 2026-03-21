@@ -18,7 +18,7 @@ interface GprofilerResult {
   intersection_size: number;
   query_size: number;
   term_size: number;
-  genes: string[][];   // intersections — list of gene lists, one per query
+  genes: string[];   // intersections flattened to single gene list
 }
 
 interface GprofilerData { results: GprofilerResult[]; }
@@ -32,8 +32,16 @@ const SOURCE_LABELS: Record<string, string> = {
   "GO:CC": "GO Cellular Component", "KEGG": "KEGG", "REAC": "Reactome",
 };
 
-interface ModalState { title: string; subtitle: string; genes: string[]; }
+interface ModalState { title: string; subtitle: string; genes: string[]; termId: string; source: string; }
 interface Props { result: Result; }
+
+function termDbUrl(termId: string, source: string): string {
+  if (source.startsWith("GO:")) return `https://www.ebi.ac.uk/QuickGO/term/${termId}`;
+  if (source === "KEGG") return `https://www.kegg.jp/pathway/${termId.replace("KEGG:", "")}`;
+  if (source === "REAC") return `https://reactome.org/content/detail/${termId}`;
+  if (source === "WP") return `https://www.wikipathways.org/pathways/${termId}`;
+  return `https://www.ebi.ac.uk/QuickGO/term/${termId}`;
+}
 
 export function EnrichmentPanel({ result }: Props) {
   const [activeSource, setActiveSource] = useState("ALL");
@@ -70,14 +78,13 @@ export function EnrichmentPanel({ result }: Props) {
   const chartTerms = useMemo(() => [...top20].reverse(), [top20]);
 
   const openModal = (term: GprofilerResult) => {
-    // genes is [[geneA, geneB, ...]] for single-query g:Profiler
-    const geneList: string[] = Array.isArray(term.genes?.[0])
-      ? (term.genes[0] as unknown as string[])
-      : (term.genes ?? []);
+    const geneCount = (term.genes ?? []).length || term.intersection_size;
     setModal({
       title: term.term_name,
-      subtitle: `${term.term_id} · ${SOURCE_LABELS[term.source] ?? term.source} · p = ${term.p_value.toExponential(2)}`,
-      genes: geneList,
+      subtitle: `${term.term_id} · ${SOURCE_LABELS[term.source] ?? term.source} · p = ${term.p_value.toExponential(2)} · ${geneCount} proteins`,
+      genes: term.genes ?? [],
+      termId: term.term_id,
+      source: term.source,
     });
   };
 
@@ -114,12 +121,26 @@ export function EnrichmentPanel({ result }: Props) {
 
   const handleRowClick = (term: GprofilerResult) => openModal(term);
 
-  const handleDownload = () => {
+  const handleDownloadJson = () => {
     if (!raw) return;
     const blob = new Blob([JSON.stringify(raw, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url;
     a.download = `gprofiler_${result.job_id}.json`; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadCsv = () => {
+    if (!filtered.length) return;
+    const header = "source,term_id,term_name,p_value,intersection_size,query_size,gene_ratio";
+    const rows = filtered.map((t) => {
+      const ratio = t.query_size > 0 ? (t.intersection_size / t.query_size).toFixed(4) : "";
+      return [t.source, t.term_id, `"${t.term_name.replace(/"/g, '""')}"`, t.p_value, t.intersection_size, t.query_size, ratio].join(",");
+    });
+    const blob = new Blob([[header, ...rows].join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url;
+    a.download = `gprofiler_${result.job_id}.csv`; a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -133,6 +154,21 @@ export function EnrichmentPanel({ result }: Props) {
           subtitle={modal.subtitle}
           proteins={toRows(modal.genes)}
           onClose={() => setModal(null)}
+          headerExtra={
+            <a
+              href={termDbUrl(modal.termId, modal.source)}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs text-primary-600 hover:underline"
+            >
+              View in database ↗
+            </a>
+          }
+          emptyFallback={
+            modal.genes.length === 0
+              ? `This term has ${modal.subtitle.match(/(\d+) proteins/)?.[1] ?? "some"} proteins from your set. Re-run analysis to see the gene list.`
+              : undefined
+          }
         />
       )}
 
@@ -202,7 +238,8 @@ export function EnrichmentPanel({ result }: Props) {
                     onChange={(e) => setSearch(e.target.value)}
                     className="rounded border border-gray-300 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary-400"
                   />
-                  <button onClick={handleDownload} className="text-xs text-primary-600 hover:underline">↓ JSON</button>
+                  <button onClick={handleDownloadJson} className="text-xs text-primary-600 hover:underline">↓ JSON</button>
+                  <button onClick={handleDownloadCsv} className="text-xs text-primary-600 hover:underline">↓ CSV</button>
                 </div>
               </div>
             </CardHeader>

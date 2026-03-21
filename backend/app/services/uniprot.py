@@ -1,8 +1,9 @@
 """
 Fetch protein annotations from UniProt REST API.
-Batches requests in groups of 100 with retry logic.
+Uses individual per-accession GET /uniprotkb/{accession} with concurrent gather.
 Also provides normalization of gene-name aliases → UniProt accessions.
 """
+import asyncio
 import logging
 import re
 from typing import Any
@@ -16,12 +17,7 @@ logger = logging.getLogger(__name__)
 settings = get_settings()
 
 UNIPROT_BASE = "https://rest.uniprot.org/uniprotkb"
-# Valid UniProt REST API v2 field names
-FIELDS = (
-    "accession,reviewed,protein_name,gene_names,organism_name,length,"
-    "sequence,cc_subcellular_location,keyword,cc_function,xref_go"
-)
-BATCH_SIZE = 100
+_MAX_CONCURRENT = 10  # semaphore slots for parallel fetches
 
 # Accession pattern: e.g. P05231, Q9UBP0, A0A000XXX (6 or 10 chars)
 _ACCESSION_RE = re.compile(r"^[OPQ][0-9][A-Z0-9]{3}[0-9]$|^[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}$")
@@ -56,7 +52,7 @@ async def normalize_protein_ids(raw_ids: list[str]) -> list[str]:
     - Unknown strings are searched directly in UniProt.
     """
     normalized: list[str] = []
-    to_resolve: list[str] = []  # (gene_symbol_or_name) pairs to search
+    to_resolve: list[str] = []
 
     for raw in raw_ids:
         clean = raw.strip()
@@ -103,44 +99,61 @@ async def _resolve_gene_symbols(genes: list[str]) -> list[str]:
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-async def _fetch_batch(client: httpx.AsyncClient, ids: list[str]) -> list[dict]:
-    query = " OR ".join(f"accession:{acc}" for acc in ids)
+async def _fetch_one(client: httpx.AsyncClient, acc: str) -> dict | None:
+    """Fetch a single UniProt entry by accession. Returns None on 404."""
     resp = await client.get(
-        f"{UNIPROT_BASE}/search",
-        params={"query": query, "fields": FIELDS, "format": "json", "size": len(ids)},
+        f"{UNIPROT_BASE}/{acc}",
+        params={"format": "json"},
         timeout=settings.http_timeout,
     )
+    if resp.status_code == 404:
+        logger.warning("UniProt accession not found: %s", acc)
+        return None
     resp.raise_for_status()
-    return resp.json().get("results", [])
+    return resp.json()
+
+
+async def _fetch_with_semaphore(
+    client: httpx.AsyncClient, sem: asyncio.Semaphore, acc: str
+) -> tuple[str, dict | None]:
+    """Acquire semaphore slot, fetch entry, return (accession, entry_or_None)."""
+    async with sem:
+        try:
+            entry = await _fetch_one(client, acc)
+            return acc, entry
+        except Exception as exc:
+            logger.warning("UniProt fetch failed for %s: %s", acc, exc)
+            return acc, None
 
 
 async def fetch_annotations(proteins: list[str]) -> dict[str, Any]:
-    """Returns {accession: annotation_dict} for all proteins."""
+    """Returns {accession: annotation_dict} for all proteins via individual lookups."""
+    sem = asyncio.Semaphore(_MAX_CONCURRENT)
     results: dict[str, Any] = {}
-    batches = [proteins[i : i + BATCH_SIZE] for i in range(0, len(proteins), BATCH_SIZE)]
 
     async with httpx.AsyncClient() as client:
-        for batch in batches:
-            try:
-                entries = await _fetch_batch(client, batch)
-                for entry in entries:
-                    acc = entry.get("primaryAccession", "")
-                    results[acc] = {
-                        "accession": acc,
-                        "reviewed": entry.get("entryType") == "UniProtKB reviewed (Swiss-Prot)",
-                        "protein_name": _extract_protein_name(entry),
-                        "gene_name": _extract_gene_name(entry),
-                        "organism": entry.get("organism", {}).get("scientificName", ""),
-                        "length": entry.get("sequence", {}).get("length", 0),
-                        "sequence": entry.get("sequence", {}).get("value", ""),
-                        "subcellular_location": _extract_locations(entry),
-                        "function": _extract_function(entry),
-                        "go_terms": _extract_go_terms(entry),
-                        "keywords": _extract_keywords(entry),
-                    }
-            except Exception as exc:
-                logger.warning("UniProt batch failed: %s", exc)
+        tasks = [_fetch_with_semaphore(client, sem, acc) for acc in proteins]
+        pairs = await asyncio.gather(*tasks)
 
+    for acc, entry in pairs:
+        if entry is None:
+            continue
+        fetched_acc = entry.get("primaryAccession", acc)
+        results[fetched_acc] = {
+            "accession": fetched_acc,
+            "reviewed": entry.get("entryType") == "UniProtKB reviewed (Swiss-Prot)",
+            "protein_name": _extract_protein_name(entry),
+            "gene_name": _extract_gene_name(entry),
+            "organism": entry.get("organism", {}).get("scientificName", ""),
+            "length": entry.get("sequence", {}).get("length", 0),
+            "sequence": entry.get("sequence", {}).get("value", ""),
+            "subcellular_location": _extract_locations(entry),
+            "function": _extract_function(entry),
+            "go_terms": _extract_go_terms(entry),
+            "keywords": _extract_keywords(entry),
+        }
+
+    logger.info("UniProt: fetched %d/%d entries", len(results), len(proteins))
     return results
 
 

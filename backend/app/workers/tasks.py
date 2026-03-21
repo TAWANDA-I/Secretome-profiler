@@ -1,12 +1,13 @@
 import asyncio
+import json
 import logging
 import uuid
 from typing import Any
 
-from sqlalchemy import select, update
+from sqlalchemy import select, text, update
 
 from app.config import get_settings
-from app.database import AsyncSessionLocal
+from app.database import WorkerSessionLocal as AsyncSessionLocal
 from app.models.job import Job
 from app.models.result import Result
 from app.services import (
@@ -38,13 +39,16 @@ async def _update_job(job_id: str, **kwargs) -> None:
 async def _set_module_progress(
     job_id: str, module: str, status: str, percent: int, message: str = ""
 ) -> None:
+    """Atomically merge one module key into the progress JSONB — no read-modify-write race."""
+    patch = json.dumps({module: {"status": status, "percent": percent, "message": message}})
     async with AsyncSessionLocal() as s:
-        r = await s.execute(select(Job).where(Job.id == uuid.UUID(job_id)))
-        job = r.scalar_one()
-        progress = dict(job.progress or {})
-        progress[module] = {"status": status, "percent": percent, "message": message}
         await s.execute(
-            update(Job).where(Job.id == uuid.UUID(job_id)).values(progress=progress)
+            text(
+                "UPDATE jobs "
+                "SET progress = COALESCE(progress::jsonb, '{}') || (:patch)::jsonb "
+                "WHERE id = :job_id"
+            ),
+            {"patch": patch, "job_id": str(uuid.UUID(job_id))},
         )
         await s.commit()
 
@@ -115,11 +119,11 @@ async def _execute_pipeline(job_id: str) -> None:
     if "gprofiler" in modules:
         parallel.append(_run_gprofiler(job_id, proteins))
     if "hpa" in modules:
-        parallel.append(_run_hpa(job_id, proteins, gene_names))
+        parallel.append(_run_hpa(job_id, proteins, gene_names, uniprot_data))
     if "signalp" in modules:
         parallel.append(_run_signalp(job_id, proteins, uniprot_data))
     if "sasp" in modules:
-        parallel.append(_run_sasp(job_id, proteins))
+        parallel.append(_run_sasp(job_id, proteins, uniprot_data))
 
     await asyncio.gather(*parallel, return_exceptions=True)
 
@@ -151,10 +155,10 @@ async def _run_gprofiler(job_id: str, proteins: list[str]) -> None:
         await _set_module_progress(job_id, "gprofiler", "failed", 0, str(e))
 
 
-async def _run_hpa(job_id: str, proteins: list[str], gene_names: dict[str, str]) -> None:
+async def _run_hpa(job_id: str, proteins: list[str], gene_names: dict[str, str], uniprot_data: dict) -> None:
     await _set_module_progress(job_id, "hpa", "running", 0)
     try:
-        data = await hpa_svc.fetch_concentrations(proteins, gene_names)
+        data = await hpa_svc.fetch_concentrations(proteins, gene_names, uniprot_data)
         await _save_result(job_id, "hpa", data, {"proteins_with_data": len(data)})
         await _set_module_progress(job_id, "hpa", "completed", 100)
     except Exception as e:
@@ -166,8 +170,10 @@ async def _run_signalp(job_id: str, proteins: list[str], uniprot_data: dict) -> 
     try:
         data = await signalp_svc.classify_signal_peptides(proteins, uniprot_data)
         summary = {
-            "classical_sp": sum(1 for v in data.values() if v.get("has_sp")),
-            "no_sp": sum(1 for v in data.values() if not v.get("has_sp")),
+            "classical_sp": sum(1 for v in data.values() if v.get("type") == "Sec/SPI"),
+            "gpi_anchored": sum(1 for v in data.values() if v.get("type") == "GPI-anchored"),
+            "unconventional": sum(1 for v in data.values() if v.get("type") == "Unconventional"),
+            "no_sp": sum(1 for v in data.values() if v.get("type") == "Other"),
         }
         await _save_result(job_id, "signalp", data, summary)
         await _set_module_progress(job_id, "signalp", "completed", 100)
@@ -176,10 +182,10 @@ async def _run_signalp(job_id: str, proteins: list[str], uniprot_data: dict) -> 
 
 
 
-async def _run_sasp(job_id: str, proteins: list[str]) -> None:
+async def _run_sasp(job_id: str, proteins: list[str], uniprot_data: dict) -> None:
     await _set_module_progress(job_id, "sasp", "running", 0)
     try:
-        data = sasp_svc.flag_sasp(proteins)
+        data = sasp_svc.flag_sasp(proteins, uniprot_data)
         await _save_result(job_id, "sasp", data,
                            {"sasp_count": data["sasp_count"], "total": len(proteins)})
         await _set_module_progress(job_id, "sasp", "completed", 100)
