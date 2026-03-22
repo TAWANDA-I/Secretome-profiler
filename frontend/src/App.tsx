@@ -6,6 +6,7 @@ import Home from "@/pages/Home";
 import Jobs from "@/pages/Jobs";
 import JobStatus from "@/pages/JobStatus";
 import Results from "@/pages/Results";
+import ComparisonResults from "@/pages/ComparisonResults";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 10_000, retry: 2 } },
@@ -23,6 +24,7 @@ export default function App() {
               <Route path="/jobs" element={<Jobs />} />
               <Route path="/jobs/:jobId" element={<JobStatus />} />
               <Route path="/results/:jobId" element={<Results />} />
+              <Route path="/comparison/:jobId" element={<ComparisonResults />} />
             </Routes>
           </main>
           <Footer />

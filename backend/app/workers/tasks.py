@@ -24,6 +24,7 @@ from app.services import (
     safety as safety_svc,
     disease_context as disease_context_svc,
 )
+from app.services.differential import run_differential_analysis
 from app.workers.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
@@ -278,3 +279,198 @@ async def _run_disease_context(job_id: str, proteins: list[str], uniprot_data: d
         await _set_module_progress(job_id, "disease_context", "completed", 100)
     except Exception as e:
         await _set_module_progress(job_id, "disease_context", "failed", 0, str(e))
+
+
+# ── Comparison pipeline ────────────────────────────────────────────────────────
+
+@celery_app.task(bind=True, name="run_comparison_pipeline")
+def run_comparison_pipeline(self, job_id: str) -> dict:
+    logger.info("Starting comparison pipeline for job %s", job_id)
+    try:
+        _run(_execute_comparison_pipeline(job_id))
+        return {"status": "completed", "job_id": job_id}
+    except Exception as exc:
+        logger.exception("Comparison pipeline failed for job %s", job_id)
+        _run(_update_job(job_id, status="failed", error_message=str(exc)))
+        raise
+
+
+async def _run_set_modules(
+    job_id: str, proteins: list[str], suffix: str
+) -> dict[str, Any]:
+    """Run all per-set modules for one set, return {module: data} dict."""
+    # Normalize proteins
+    try:
+        norm_proteins = await uniprot_svc.normalize_protein_ids(proteins)
+    except Exception:
+        norm_proteins = proteins
+
+    results: dict[str, Any] = {}
+
+    # UniProt
+    mod = f"uniprot_{suffix}"
+    await _set_module_progress(job_id, mod, "running", 0)
+    try:
+        uniprot_data = await uniprot_svc.fetch_annotations(norm_proteins)
+        summary = {
+            "total": len(norm_proteins),
+            "annotated": len(uniprot_data),
+            "reviewed": sum(1 for v in uniprot_data.values() if v.get("reviewed")),
+        }
+        await _save_result(job_id, mod, uniprot_data, summary)
+        await _set_module_progress(job_id, mod, "completed", 100)
+        results["uniprot"] = uniprot_data
+    except Exception as e:
+        await _set_module_progress(job_id, mod, "failed", 0, str(e))
+        results["uniprot"] = {}
+        uniprot_data = {}
+
+    gene_names: dict[str, str] = {
+        acc: info.get("gene_name", "")
+        for acc, info in uniprot_data.items()
+        if info.get("gene_name")
+    }
+
+    # Run gprofiler, hpa, signalp, sasp in parallel
+    async def _gprof():
+        m = f"gprofiler_{suffix}"
+        await _set_module_progress(job_id, m, "running", 0)
+        try:
+            data = await gprofiler_svc.run_enrichment(norm_proteins)
+            await _save_result(job_id, m, data, {"term_count": len(data.get("results", []))})
+            await _set_module_progress(job_id, m, "completed", 100)
+            results["gprofiler"] = data
+        except Exception as e:
+            await _set_module_progress(job_id, m, "failed", 0, str(e))
+            results["gprofiler"] = {}
+
+    async def _hpa():
+        m = f"hpa_{suffix}"
+        await _set_module_progress(job_id, m, "running", 0)
+        try:
+            data = await hpa_svc.fetch_concentrations(norm_proteins, gene_names, uniprot_data)
+            await _save_result(job_id, m, data, {"proteins_with_data": len(data)})
+            await _set_module_progress(job_id, m, "completed", 100)
+            results["hpa"] = data
+        except Exception as e:
+            await _set_module_progress(job_id, m, "failed", 0, str(e))
+            results["hpa"] = {}
+
+    async def _signalp():
+        m = f"signalp_{suffix}"
+        await _set_module_progress(job_id, m, "running", 0)
+        try:
+            data = await signalp_svc.classify_signal_peptides(norm_proteins, uniprot_data)
+            summary = {
+                "classical_sp": sum(1 for v in data.values() if v.get("type") == "Sec/SPI"),
+                "no_sp": sum(1 for v in data.values() if v.get("type") == "Other"),
+            }
+            await _save_result(job_id, m, data, summary)
+            await _set_module_progress(job_id, m, "completed", 100)
+            results["signalp"] = data
+        except Exception as e:
+            await _set_module_progress(job_id, m, "failed", 0, str(e))
+            results["signalp"] = {}
+
+    async def _sasp():
+        m = f"sasp_{suffix}"
+        await _set_module_progress(job_id, m, "running", 0)
+        try:
+            data = sasp_svc.flag_sasp(norm_proteins, uniprot_data)
+            await _save_result(job_id, m, data, {"sasp_count": data.get("sasp_count", 0)})
+            await _set_module_progress(job_id, m, "completed", 100)
+            results["sasp"] = data
+        except Exception as e:
+            await _set_module_progress(job_id, m, "failed", 0, str(e))
+            results["sasp"] = {}
+
+    await asyncio.gather(_gprof(), _hpa(), _signalp(), _sasp(), return_exceptions=True)
+
+    # Therapeutic + Safety (phase 2 - after uniprot)
+    async def _ther():
+        m = f"therapeutic_{suffix}"
+        await _set_module_progress(job_id, m, "running", 0)
+        try:
+            data = therapeutic_svc.score_therapeutic_indications(norm_proteins, uniprot_data)
+            await _save_result(job_id, m, data, {
+                "top_indication": data.get("top_indication", ""),
+                "indications_scored": len(data.get("indications", [])),
+            })
+            await _set_module_progress(job_id, m, "completed", 100)
+            results["therapeutic"] = data
+        except Exception as e:
+            await _set_module_progress(job_id, m, "failed", 0, str(e))
+            results["therapeutic"] = {}
+
+    async def _safe():
+        m = f"safety_{suffix}"
+        await _set_module_progress(job_id, m, "running", 0)
+        try:
+            data = safety_svc.profile_safety(norm_proteins, uniprot_data)
+            await _save_result(job_id, m, data, {
+                "risk_level": data.get("risk_level", ""),
+                "total_flagged": data.get("total_flagged", 0),
+            })
+            await _set_module_progress(job_id, m, "completed", 100)
+            results["safety"] = data
+        except Exception as e:
+            await _set_module_progress(job_id, m, "failed", 0, str(e))
+            results["safety"] = {}
+
+    await asyncio.gather(_ther(), _safe(), return_exceptions=True)
+
+    return results
+
+
+async def _execute_comparison_pipeline(job_id: str) -> None:
+    async with AsyncSessionLocal() as s:
+        r = await s.execute(select(Job).where(Job.id == uuid.UUID(job_id)))
+        job = r.scalar_one()
+        proteins_a: list[str] = job.proteins_a or []
+        proteins_b: list[str] = job.proteins_b or []
+        set_a_label: str = job.set_a_label or "Set A"
+        set_b_label: str = job.set_b_label or "Set B"
+
+    await _update_job(job_id, status="running")
+
+    # Run both sets in parallel
+    results_ab = await asyncio.gather(
+        _run_set_modules(job_id, proteins_a, "A"),
+        _run_set_modules(job_id, proteins_b, "B"),
+        return_exceptions=True,
+    )
+
+    res_a = results_ab[0] if isinstance(results_ab[0], dict) else {}
+    res_b = results_ab[1] if isinstance(results_ab[1], dict) else {}
+
+    # Differential analysis
+    await _set_module_progress(job_id, "differential", "running", 0)
+    try:
+        diff_data = run_differential_analysis(
+            job_id=job_id,
+            set_a_label=set_a_label,
+            set_b_label=set_b_label,
+            uniprot_a=res_a.get("uniprot", {}),
+            uniprot_b=res_b.get("uniprot", {}),
+            gprofiler_a=res_a.get("gprofiler", {}),
+            gprofiler_b=res_b.get("gprofiler", {}),
+            therapeutic_a=res_a.get("therapeutic", {}),
+            therapeutic_b=res_b.get("therapeutic", {}),
+            safety_a=res_a.get("safety", {}),
+            safety_b=res_b.get("safety", {}),
+            hpa_a=res_a.get("hpa", {}),
+            hpa_b=res_b.get("hpa", {}),
+        )
+        await _save_result(job_id, "differential", diff_data, {
+            "jaccard": diff_data.get("overlap", {}).get("jaccard_similarity", 0),
+            "shared_count": diff_data.get("overlap", {}).get("shared_count", 0),
+            "sig_pathways_a": diff_data.get("pathway", {}).get("volcano", {}).get("significant_count_a", 0),
+            "sig_pathways_b": diff_data.get("pathway", {}).get("volcano", {}).get("significant_count_b", 0),
+        })
+        await _set_module_progress(job_id, "differential", "completed", 100)
+    except Exception as e:
+        logger.exception("Differential analysis failed for job %s", job_id)
+        await _set_module_progress(job_id, "differential", "failed", 0, str(e))
+
+    await _update_job(job_id, status="completed")
+    logger.info("Comparison pipeline completed for job %s", job_id)

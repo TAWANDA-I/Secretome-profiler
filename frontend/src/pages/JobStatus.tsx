@@ -110,7 +110,9 @@ export default function JobStatus() {
 
       <div className="flex gap-3">
         {job.status === "completed" && (
-          <Button onClick={() => navigate(`/results/${job.id}`)}>
+          <Button onClick={() => navigate(
+            job.job_type === "comparison" ? `/comparison/${job.id}` : `/results/${job.id}`
+          )}>
             View Results
           </Button>
         )}

@@ -134,12 +134,27 @@ export default function Jobs() {
           <Card
             key={job.id}
             className="cursor-pointer hover:border-primary-300 transition-colors"
-            onClick={() => navigate(`/jobs/${job.id}`)}
+            onClick={() => {
+              if (job.status === "completed" && job.job_type === "comparison") {
+                navigate(`/comparison/${job.id}`);
+              } else {
+                navigate(`/jobs/${job.id}`);
+              }
+            }}
           >
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>{job.label ?? "Untitled Job"}</CardTitle>
+                <div>
+                  <CardTitle>
+                    {job.job_type === "comparison" && job.set_a_label && job.set_b_label
+                      ? `${job.set_a_label} vs ${job.set_b_label}`
+                      : (job.label ?? "Untitled Job")}
+                  </CardTitle>
+                </div>
                 <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                  {job.job_type === "comparison" && (
+                    <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700">Comparison</span>
+                  )}
                   <Badge status={job.status} />
                   <button
                     disabled={deleting === job.id}
@@ -165,6 +180,7 @@ export default function Jobs() {
             </CardContent>
           </Card>
         ))}
+
       </div>
     </div>
   );

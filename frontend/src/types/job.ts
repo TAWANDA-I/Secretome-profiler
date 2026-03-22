@@ -23,11 +23,16 @@ export interface ModuleProgress {
 export interface Job {
   id: string;
   status: JobStatus;
+  job_type: "single" | "comparison";
   proteins: string[];
-  modules: ModuleName[];
-  progress: Record<ModuleName, ModuleProgress>;
+  modules: string[];
+  progress: Record<string, ModuleProgress>;
   error_message: string | null;
   label: string | null;
+  proteins_a: string[] | null;
+  proteins_b: string[] | null;
+  set_a_label: string | null;
+  set_b_label: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -35,13 +40,23 @@ export interface Job {
 export interface JobSummary {
   id: string;
   status: JobStatus;
+  job_type: "single" | "comparison";
   label: string | null;
+  set_a_label: string | null;
+  set_b_label: string | null;
   created_at: string;
   updated_at: string;
 }
 
 export interface JobCreate {
-  proteins: string[];
+  job_type?: "single" | "comparison";
+  // single mode
+  proteins?: string[];
   modules?: ModuleName[];
   label?: string;
+  // comparison mode
+  set_a_proteins?: string[];
+  set_a_label?: string;
+  set_b_proteins?: string[];
+  set_b_label?: string;
 }

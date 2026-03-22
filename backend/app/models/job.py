@@ -19,12 +19,19 @@ class Job(Base):
         default="pending",
         index=True,
     )
+    # 'single' or 'comparison'
+    job_type: Mapped[str] = mapped_column(String(20), nullable=False, default="single")
     proteins: Mapped[list] = mapped_column(JSON, nullable=False)
     modules: Mapped[list] = mapped_column(JSON, nullable=False)
     # {module_name: {status, percent, message}}
     progress: Mapped[dict] = mapped_column(JSON, default=dict)
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     label: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # Comparison-specific fields
+    proteins_a: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    proteins_b: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    set_a_label: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    set_b_label: Mapped[str | None] = mapped_column(String(100), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -33,4 +40,4 @@ class Job(Base):
     )
 
     def __repr__(self) -> str:
-        return f"<Job id={self.id} status={self.status}>"
+        return f"<Job id={self.id} status={self.status} type={self.job_type}>"
