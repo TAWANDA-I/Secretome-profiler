@@ -1,6 +1,12 @@
 import type { DownloadURL, Result } from "@/types";
 import api from "./index";
 
+export interface MethodsReport {
+  text: string;
+  bibtex: string;
+  generated_at: string;
+}
+
 export const resultsApi = {
   forJob: (jobId: string) =>
     api.get<Result[]>(`/results/job/${jobId}`).then((r) => r.data),
@@ -16,4 +22,10 @@ export const resultsApi = {
 
   downloadUrl: (id: string) =>
     api.get<DownloadURL>(`/results/${id}/download`).then((r) => r.data),
+
+  /** Generate publication-ready methods section from all module results. */
+  getMethodsReport: (jobId: string) =>
+    api
+      .get<MethodsReport>(`/results/job/${jobId}/methods_report`)
+      .then((r) => r.data),
 };

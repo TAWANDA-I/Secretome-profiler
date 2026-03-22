@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { resultsApi } from "@/api/results";
@@ -17,7 +17,7 @@ import type { Result } from "@/types";
 // Phase 2 modules are rendered together in a single composite tab
 const PHASE2_MODULES = new Set(["therapeutic", "receptor_ligand", "safety", "disease_context"]);
 
-const PANEL_MAP: Record<string, React.ComponentType<{ result: Result }>> = {
+const PANEL_MAP: Record<string, ComponentType<{ result: Result }>> = {
   uniprot:   UniprotPanel,
   string:    StringNetworkPanel,
   gprofiler: EnrichmentPanel,
@@ -41,6 +41,7 @@ const TAB_LABELS: Record<string, string> = {
 export default function Results() {
   const { jobId } = useParams<{ jobId: string }>();
   const [activeTab, setActiveTab] = useState<string>("summary");
+  const [showMethodsModal, setShowMethodsModal] = useState(false);
 
   const { data: results, isLoading } = useQuery({
     queryKey: ["results", jobId],
@@ -83,8 +84,18 @@ export default function Results() {
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 space-y-4">
-      <h1 className="text-xl font-bold text-gray-900">Analysis Results</h1>
-      <p className="text-xs text-gray-400 font-mono">{jobId}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">Analysis Results</h1>
+          <p className="text-xs text-gray-400 font-mono">{jobId}</p>
+        </div>
+        <button
+          onClick={() => setShowMethodsModal(true)}
+          className="shrink-0 px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          Export Methods
+        </button>
+      </div>
 
       {/* Tab bar */}
       <div className="flex gap-1 border-b border-gray-200 overflow-x-auto">
@@ -126,6 +137,11 @@ export default function Results() {
           </CardContent>
         </Card>
       )}
+
+      {/* Methods export modal */}
+      {showMethodsModal && jobId && (
+        <MethodsModal jobId={jobId} onClose={() => setShowMethodsModal(false)} />
+      )}
     </div>
   );
 }
@@ -160,6 +176,114 @@ function DownloadButton({ jobId, moduleName }: { jobId: string; moduleName: stri
       >
         {loading ? "Downloading…" : "↓ Download JSON"}
       </button>
+    </div>
+  );
+}
+
+function MethodsModal({ jobId, onClose }: { jobId: string; onClose: () => void }) {
+  const [copied, setCopied] = useState(false);
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["methods_report", jobId],
+    queryFn: () => resultsApi.getMethodsReport(jobId),
+  });
+
+  const handleCopy = () => {
+    if (!data?.text) return;
+    navigator.clipboard.writeText(data.text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const handleDownloadTxt = () => {
+    if (!data?.text) return;
+    const blob = new Blob([data.text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `methods_${jobId}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadBib = () => {
+    if (!data?.bibtex) return;
+    const blob = new Blob([data.bibtex], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `citations_${jobId}.bib`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl flex flex-col max-h-[90vh]">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <h2 className="text-base font-semibold text-gray-900">
+            Methods Section — ready for manuscript
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 text-xl leading-none"
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          {isLoading && (
+            <div className="flex justify-center py-12">
+              <Spinner size="lg" />
+            </div>
+          )}
+          {error && (
+            <p className="text-red-600 text-sm">Failed to generate methods section.</p>
+          )}
+          {data?.text && (
+            <textarea
+              readOnly
+              value={data.text}
+              className="w-full h-96 rounded-md border border-gray-300 px-3 py-2 text-xs font-mono text-gray-800 resize-none focus:outline-none"
+            />
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex flex-wrap gap-2 px-6 py-4 border-t border-gray-200">
+          <button
+            onClick={handleCopy}
+            disabled={!data?.text}
+            className="px-3 py-1.5 text-sm font-medium rounded-md bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-40 transition-colors"
+          >
+            {copied ? "Copied!" : "Copy to clipboard"}
+          </button>
+          <button
+            onClick={handleDownloadTxt}
+            disabled={!data?.text}
+            className="px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 transition-colors"
+          >
+            Download as .txt
+          </button>
+          <button
+            onClick={handleDownloadBib}
+            disabled={!data?.bibtex}
+            className="px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 transition-colors"
+          >
+            Download citations (.bib)
+          </button>
+          <button
+            onClick={onClose}
+            className="ml-auto px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

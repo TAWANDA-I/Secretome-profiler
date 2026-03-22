@@ -6,9 +6,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.models.job import Job
 from app.models.result import Result
 from app.schemas.result import ResultDownloadURL, ResultRead
 from app.services import minio_client
+from app.services.methods_report import generate_report
 
 router = APIRouter()
 
@@ -41,6 +43,41 @@ async def get_result_data(
         return JSONResponse(content=data)
     except FileNotFoundError:
         return JSONResponse(content={})
+
+
+@router.get("/job/{job_id}/methods_report")
+async def get_methods_report(
+    job_id: uuid.UUID, db: AsyncSession = Depends(get_db)
+) -> JSONResponse:
+    """Generate a publication-ready methods section from all module results."""
+    # Load the job to get the protein list
+    job_res = await db.execute(select(Job).where(Job.id == job_id))
+    job = job_res.scalar_one_or_none()
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    # Load all results for the job
+    res = await db.execute(select(Result).where(Result.job_id == job_id))
+    results = list(res.scalars().all())
+
+    # Download MinIO payloads for each module
+    module_data: dict = {}
+    for result in results:
+        if result.minio_key:
+            try:
+                data = await minio_client.download_json(result.minio_key)
+                module_data[result.module_name] = data
+            except Exception:
+                module_data[result.module_name] = {}
+        else:
+            module_data[result.module_name] = {}
+
+    report = generate_report(
+        job_id=str(job_id),
+        proteins=job.proteins or [],
+        module_data=module_data,
+    )
+    return JSONResponse(content=report)
 
 
 @router.get("/{result_id}", response_model=ResultRead)
