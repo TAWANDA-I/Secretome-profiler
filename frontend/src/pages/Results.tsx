@@ -16,6 +16,7 @@ import ConcentrationsTab from "@/components/results/ConcentrationsTab";
 import PharmacokineticTab from "@/components/results/PharmacokineticTab";
 import InterpretationTab from "@/components/results/InterpretationTab";
 import ReferenceLibraryTab from "@/components/results/ReferenceLibraryTab";
+import SecretomeChat from "@/components/SecretomeChat";
 import type { Result } from "@/types";
 
 // Phase 2 modules are rendered together in a single composite tab
@@ -173,6 +174,9 @@ export default function Results() {
       {showMethodsModal && jobId && (
         <MethodsModal jobId={jobId} onClose={() => setShowMethodsModal(false)} />
       )}
+
+      {/* Floating Q&A assistant */}
+      <SecretomeChat jobId={jobId!} />
     </div>
   );
 }
