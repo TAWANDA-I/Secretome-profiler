@@ -30,6 +30,21 @@ const parseProteins = (text: string): string[] =>
     .map((s) => s.trim().toUpperCase())
     .filter(Boolean);
 
+// Parse "GENE, 12345.0" lines → {gene: number}
+function parseConcentrations(text: string): Record<string, number> | null {
+  const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean);
+  const result: Record<string, number> = {};
+  for (const line of lines) {
+    const parts = line.split(/,\s*/);
+    if (parts.length >= 2) {
+      const gene = parts[0].trim().toUpperCase();
+      const conc = parseFloat(parts[1]);
+      if (gene && !isNaN(conc) && conc > 0) result[gene] = conc;
+    }
+  }
+  return Object.keys(result).length > 0 ? result : null;
+}
+
 export default function Home() {
   const navigate = useNavigate();
   const { createJob, loading, error, clearError } = useJobStore();
@@ -42,6 +57,8 @@ export default function Home() {
   const [selectedModules, setSelectedModules] = useState<Set<ModuleName>>(
     new Set(ALL_MODULES)
   );
+  // Concentration input mode
+  const [concMode, setConcMode] = useState<"names" | "concentrations">("names");
 
   // Comparison mode state
   const [rawA, setRawA] = useState("");
@@ -75,11 +92,15 @@ export default function Home() {
     clearError();
     if (proteins.length === 0) return;
     if (proteins.length > 1000) { alert("Maximum 1000 proteins per job."); return; }
+
+    const concentrations = concMode === "concentrations" ? parseConcentrations(raw) : null;
+
     const job = await createJob({
       job_type: "single",
-      proteins,
+      proteins: concentrations ? Object.keys(concentrations) : proteins,
       modules: [...selectedModules],
       label: label || undefined,
+      protein_concentrations: concentrations ?? undefined,
     });
     navigate(`/jobs/${job.id}`);
   };
@@ -153,16 +174,51 @@ export default function Home() {
       {mode === "single" && (
         <form onSubmit={handleSingleSubmit} className="space-y-5">
           <Card>
-            <CardHeader><CardTitle>Protein IDs</CardTitle></CardHeader>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Protein IDs</CardTitle>
+                <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs">
+                  <button
+                    type="button"
+                    onClick={() => { setConcMode("names"); setRaw(""); }}
+                    className={`px-3 py-1.5 transition-colors ${concMode === "names" ? "bg-primary-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                  >
+                    Gene names only
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setConcMode("concentrations"); setRaw(""); }}
+                    className={`px-3 py-1.5 transition-colors ${concMode === "concentrations" ? "bg-primary-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                  >
+                    + Concentrations (pg/mL)
+                  </button>
+                </div>
+              </div>
+            </CardHeader>
             <CardContent className="space-y-2">
+              {concMode === "concentrations" && (
+                <div className="rounded-md bg-blue-50 border border-blue-200 px-3 py-2 text-xs text-blue-700">
+                  Enter one protein per line as <span className="font-mono">GENE_NAME, concentration_pg_ml</span>
+                  <br/>Example: <span className="font-mono">IL6, 45230</span> — enables Concentrations tab with physiological reference comparison.
+                </div>
+              )}
               <textarea
                 className="w-full h-40 rounded-md border border-gray-300 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
-                placeholder={"P05231\nP01375\nP01584\n...\n(paste UniProt accessions, one per line or comma-separated)"}
+                placeholder={concMode === "concentrations"
+                  ? "IL6, 45230\nVEGFA, 18900\nHGF, 2340\nTGFB1, 890\n..."
+                  : "P05231\nP01375\nP01584\n...\n(paste UniProt accessions, one per line or comma-separated)"}
                 value={raw}
                 onChange={(e) => setRaw(e.target.value)}
               />
               <p className="text-xs text-gray-400">
-                {proteins.length} protein{proteins.length !== 1 ? "s" : ""} detected
+                {concMode === "concentrations"
+                  ? (() => {
+                      const concs = parseConcentrations(raw);
+                      const n = concs ? Object.keys(concs).length : 0;
+                      return `${n} protein${n !== 1 ? "s" : ""} with concentrations detected`;
+                    })()
+                  : `${proteins.length} protein${proteins.length !== 1 ? "s" : ""} detected`
+                }
               </p>
             </CardContent>
           </Card>
@@ -208,7 +264,10 @@ export default function Home() {
             type="submit"
             size="lg"
             loading={loading}
-            disabled={proteins.length === 0 || selectedModules.size === 0}
+            disabled={
+              (concMode === "names" ? proteins.length === 0 : !parseConcentrations(raw)) ||
+              selectedModules.size === 0
+            }
             className="w-full justify-center"
           >
             Analyse

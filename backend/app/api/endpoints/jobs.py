@@ -21,12 +21,22 @@ async def create_job(payload: JobCreate, db: AsyncSession = Depends(get_db)) -> 
 
 
 async def _create_single_job(payload: JobCreate, db: AsyncSession) -> Job:
+    modules = list(payload.modules)
+    # Add concentration / PK modules when concentrations are provided
+    if payload.protein_concentrations:
+        if "concentrations" not in modules:
+            modules.append("concentrations")
+    # PK module always runs (relies only on UniProt data)
+    if "pk" not in modules:
+        modules.append("pk")
+
     job = Job(
         job_type="single",
         proteins=payload.proteins,
-        modules=payload.modules,
+        modules=modules,
         label=payload.label,
-        progress={m: {"status": "pending", "percent": 0, "message": ""} for m in payload.modules},
+        protein_concentrations=payload.protein_concentrations or None,
+        progress={m: {"status": "pending", "percent": 0, "message": ""} for m in modules},
     )
     db.add(job)
     await db.flush()

@@ -36,6 +36,13 @@ class JobCreate(BaseModel):
     )
     label: str | None = Field(None, max_length=255)
 
+    # ── Quantitative concentrations (optional) ────────────────────────────────
+    # {gene_name: concentration_pg_ml} — if provided, enables Concentrations tab
+    protein_concentrations: dict[str, float] | None = Field(
+        None,
+        description="Optional: gene name to concentration mapping in pg/mL",
+    )
+
     # ── Comparison mode ───────────────────────────────────────────────────────
     set_a_proteins: list[str] = Field(default_factory=list, max_length=1000)
     set_a_label: str | None = Field(None, max_length=100)
@@ -64,6 +71,7 @@ class JobRead(BaseModel):
     proteins_b: list[str] | None = None
     set_a_label: str | None = None
     set_b_label: str | None = None
+    protein_concentrations: dict[str, float] | None = None
     created_at: datetime
     updated_at: datetime
 

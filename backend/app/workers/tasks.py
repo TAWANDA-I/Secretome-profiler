@@ -25,6 +25,8 @@ from app.services import (
     disease_context as disease_context_svc,
 )
 from app.services.differential import run_differential_analysis
+from app.services.concentration_analysis import analyze_concentrations
+from app.services.pk_analysis import analyze_pk_properties
 from app.workers.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
@@ -84,6 +86,7 @@ async def _execute_pipeline(job_id: str) -> None:
         job = r.scalar_one()
         raw_proteins: list[str] = job.proteins
         modules: set[str] = set(job.modules)
+        protein_concentrations: dict[str, float] | None = job.protein_concentrations
 
     await _update_job(job_id, status="running")
 
@@ -135,10 +138,15 @@ async def _execute_pipeline(job_id: str) -> None:
     if "comparison" in modules:
         await _run_comparison(job_id, proteins)
 
-    # Phase 2: Therapeutic Analysis Layer (runs after Phase 1 completes)
+    # Phase 2a: PK analysis (fast, depends only on UniProt — runs first so therapeutic can use it)
+    pk_data: dict | None = None
+    if "pk" in modules:
+        pk_data = await _run_pk(job_id, proteins, uniprot_data)
+
+    # Phase 2b: Therapeutic Analysis Layer (runs after Phase 1 + PK complete)
     phase2 = []
     if "therapeutic" in modules:
-        phase2.append(_run_therapeutic(job_id, proteins, uniprot_data))
+        phase2.append(_run_therapeutic(job_id, proteins, uniprot_data, pk_data, protein_concentrations))
     if "receptor_ligand" in modules:
         phase2.append(_run_receptor_ligand(job_id, proteins, uniprot_data))
     if "safety" in modules:
@@ -148,6 +156,10 @@ async def _execute_pipeline(job_id: str) -> None:
 
     if phase2:
         await asyncio.gather(*phase2, return_exceptions=True)
+
+    # Phase 3: Concentration analysis (requires UniProt data)
+    if "concentrations" in modules and protein_concentrations:
+        await _run_concentrations(job_id, proteins, protein_concentrations, uniprot_data)
 
     await _update_job(job_id, status="completed")
     logger.info("Pipeline completed for job %s", job_id)
@@ -222,10 +234,20 @@ async def _run_comparison(job_id: str, proteins: list[str]) -> None:
         await _set_module_progress(job_id, "comparison", "failed", 0, str(e))
 
 
-async def _run_therapeutic(job_id: str, proteins: list[str], uniprot_data: dict) -> None:
+async def _run_therapeutic(
+    job_id: str,
+    proteins: list[str],
+    uniprot_data: dict,
+    pk_data: dict | None = None,
+    protein_concentrations: dict[str, float] | None = None,
+) -> None:
     await _set_module_progress(job_id, "therapeutic", "running", 0)
     try:
-        data = therapeutic_svc.score_therapeutic_indications(proteins, uniprot_data)
+        data = therapeutic_svc.score_therapeutic_indications(
+            proteins, uniprot_data,
+            pk_data=pk_data,
+            protein_concentrations=protein_concentrations,
+        )
         top = data.get("top_indication", "")
         confidence = data.get("overall_confidence", "")
         indications_scored = len(data.get("indications", []))
@@ -279,6 +301,49 @@ async def _run_disease_context(job_id: str, proteins: list[str], uniprot_data: d
         await _set_module_progress(job_id, "disease_context", "completed", 100)
     except Exception as e:
         await _set_module_progress(job_id, "disease_context", "failed", 0, str(e))
+
+
+async def _run_pk(job_id: str, proteins: list[str], uniprot_data: dict) -> dict | None:
+    await _set_module_progress(job_id, "pk", "running", 0)
+    try:
+        uniprot_list = {"proteins": list(uniprot_data.values())} if isinstance(uniprot_data, dict) else uniprot_data
+        gene_names = [
+            info.get("gene_name", acc)
+            for acc, info in (uniprot_data.items() if isinstance(uniprot_data, dict) else {}.items())
+        ] or proteins
+        data = analyze_pk_properties(gene_names, uniprot_list)
+        summary = data.get("pk_summary", {})
+        await _save_result(job_id, "pk", data, {
+            "total_proteins": summary.get("total_proteins", 0),
+            "bbb_crossing": summary.get("bbb_crossing", 0),
+            "short_half_life_count": summary.get("short_half_life_count", 0),
+        })
+        await _set_module_progress(job_id, "pk", "completed", 100)
+        return data
+    except Exception as e:
+        await _set_module_progress(job_id, "pk", "failed", 0, str(e))
+        return None
+
+
+async def _run_concentrations(
+    job_id: str,
+    proteins: list[str],
+    user_concentrations: dict[str, float],
+    uniprot_data: dict,
+) -> None:
+    await _set_module_progress(job_id, "concentrations", "running", 0)
+    try:
+        # Pass the raw uniprot_data dict (keyed by accession) so the service
+        # can resolve any accession or gene-name input to a canonical gene name
+        data = analyze_concentrations(proteins, user_concentrations, uniprot_data)
+        await _save_result(job_id, "concentrations", data, {
+            "proteins_with_data": data["proteins_with_data"],
+            "total_quantified": data["total_quantified"],
+            "caution_count": len(data["summary"]["caution_proteins"]),
+        })
+        await _set_module_progress(job_id, "concentrations", "completed", 100)
+    except Exception as e:
+        await _set_module_progress(job_id, "concentrations", "failed", 0, str(e))
 
 
 # ── Comparison pipeline ────────────────────────────────────────────────────────

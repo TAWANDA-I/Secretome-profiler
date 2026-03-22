@@ -32,6 +32,8 @@ class Job(Base):
     proteins_b: Mapped[list | None] = mapped_column(JSON, nullable=True)
     set_a_label: Mapped[str | None] = mapped_column(String(100), nullable=True)
     set_b_label: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    # Quantitative concentration input: {gene_name: concentration_pg_ml}
+    protein_concentrations: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

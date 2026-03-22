@@ -1,0 +1,838 @@
+{
+  "IL1B": {
+    "molecular_weight_kda": 17.5,
+    "plasma_half_life_hours": 4.0,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "Receptor-mediated transcytosis via IL1R1 on brain endothelium",
+      "evidence_level": "probable",
+      "notes": "Limited crossing under normal conditions; significantly increased with neuroinflammation or BBB disruption",
+      "pmid": "9813133"
+    },
+    "csf_blood_ratio": 0.1,
+    "renal_clearance": true,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["IL1R1"],
+    "serum_binding_proteins": ["IL1RA"],
+    "bioavailability_notes": "Short systemic half-life; local tissue effects dominate"
+  },
+  "IL2": {
+    "molecular_weight_kda": 15.5,
+    "plasma_half_life_hours": 0.12,
+    "half_life_source": "literature",
+    "half_life_route": "IV bolus",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "No established BBB transport mechanism; excluded by size and polarity",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": true,
+    "is_glycosylated": false,
+    "active_transport_receptors": [],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Extremely short half-life (7 min); requires continuous infusion for sustained effect"
+  },
+  "IL4": {
+    "molecular_weight_kda": 15.0,
+    "plasma_half_life_hours": 2.5,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "No established transport mechanism across intact BBB",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": true,
+    "is_glycosylated": false,
+    "active_transport_receptors": [],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Moderate half-life; receptor internalization is primary clearance mechanism"
+  },
+  "IL6": {
+    "molecular_weight_kda": 21.0,
+    "plasma_half_life_hours": 1.5,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "Saturable transport system at blood-brain barrier; enhanced with neuroinflammation",
+      "evidence_level": "established",
+      "notes": "CSF levels ~10% of plasma; directly activates brain astrocytes and microglia via trans-signaling",
+      "pmid": "9813133"
+    },
+    "csf_blood_ratio": 0.1,
+    "renal_clearance": true,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["IL6R", "gp130"],
+    "serum_binding_proteins": ["sIL6R"],
+    "bioavailability_notes": "Trans-signaling extends effective range beyond direct receptor binding"
+  },
+  "IL8": {
+    "molecular_weight_kda": 8.4,
+    "plasma_half_life_hours": 1.0,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Primarily acts at peripheral sites; no CNS transport established",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": true,
+    "is_glycosylated": false,
+    "active_transport_receptors": [],
+    "serum_binding_proteins": ["heparan sulfate proteoglycans"],
+    "bioavailability_notes": "Binds heavily to extracellular matrix; effective local concentration exceeds plasma levels"
+  },
+  "CXCL8": {
+    "molecular_weight_kda": 8.4,
+    "plasma_half_life_hours": 1.0,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Primarily acts at peripheral sites",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": true,
+    "is_glycosylated": false,
+    "active_transport_receptors": [],
+    "serum_binding_proteins": ["heparan sulfate proteoglycans"],
+    "bioavailability_notes": "ECM binding creates concentration gradients"
+  },
+  "IL10": {
+    "molecular_weight_kda": 18.5,
+    "plasma_half_life_hours": 2.0,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Anti-inflammatory cytokine; limited CNS penetration reported",
+      "pmid": null
+    },
+    "csf_blood_ratio": 0.05,
+    "renal_clearance": true,
+    "is_glycosylated": false,
+    "active_transport_receptors": [],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Receptor-mediated clearance is primary elimination mechanism"
+  },
+  "TNF": {
+    "molecular_weight_kda": 17.4,
+    "plasma_half_life_hours": 1.0,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "Receptor-mediated transport (TNFR1/TNFR2); significantly increased with neuroinflammation and BBB damage",
+      "evidence_level": "probable",
+      "notes": "Trimeric form (51 kDa) has limited crossing; monomers may cross more readily; important in neuroinflammation",
+      "pmid": "9813133"
+    },
+    "csf_blood_ratio": 0.05,
+    "renal_clearance": false,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["TNFR1", "TNFR2"],
+    "serum_binding_proteins": ["sTNFR1", "sTNFR2"],
+    "bioavailability_notes": "Soluble receptors act as decoys extending effective half-life; membrane-bound form has different kinetics"
+  },
+  "IFNG": {
+    "molecular_weight_kda": 16.9,
+    "plasma_half_life_hours": 0.8,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Peripheral immune activation is primary function; CNS effects indirect via macrophage activation",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": [],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Glycosylation extends half-life; dimerization required for receptor binding"
+  },
+  "TGFB1": {
+    "molecular_weight_kda": 44.3,
+    "plasma_half_life_hours": 3.0,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Large molecular weight and binding to latency-associated peptide; local ECM binding dominant; some crossing in pathology",
+      "pmid": null
+    },
+    "csf_blood_ratio": 0.02,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": [],
+    "serum_binding_proteins": ["LTBP1", "LTBP3", "alpha2-macroglobulin"],
+    "bioavailability_notes": "Mostly inactive as latent complex in circulation; activation by proteases, integrins required"
+  },
+  "VEGFA": {
+    "molecular_weight_kda": 27.0,
+    "plasma_half_life_hours": 1.0,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": "Does NOT cross BBB; instead promotes BBB permeability via VEGFR2 on endothelium",
+      "evidence_level": "established",
+      "notes": "Paradoxically, VEGFA increases BBB permeability allowing other proteins to cross; itself does not pass",
+      "pmid": "22641679"
+    },
+    "csf_blood_ratio": 0.01,
+    "renal_clearance": true,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["VEGFR1", "VEGFR2", "NRP1"],
+    "serum_binding_proteins": ["sVEGFR1", "heparan sulfate"],
+    "bioavailability_notes": "Multiple isoforms (VEGFA-121, -165, -189) with different heparin binding; isoform-dependent clearance"
+  },
+  "HGF": {
+    "molecular_weight_kda": 83.0,
+    "plasma_half_life_hours": 3.5,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Large protein (83 kDa); does not cross intact BBB; local production by astrocytes is relevant CNS source",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["MET"],
+    "serum_binding_proteins": ["heparan sulfate proteoglycans"],
+    "bioavailability_notes": "Rapidly inactivated by serum; ECM binding creates local depot"
+  },
+  "EGF": {
+    "molecular_weight_kda": 6.2,
+    "plasma_half_life_hours": 0.08,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Extremely short half-life; rapid receptor-mediated internalization; autocrine/paracrine signaling dominant",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": true,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["EGFR"],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Half-life of 5 minutes; essentially acts as local signal only; sustained delivery required for therapeutic use"
+  },
+  "FGF2": {
+    "molecular_weight_kda": 18.0,
+    "plasma_half_life_hours": 1.0,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Binds avidly to heparan sulfate; most activity is paracrine at ECM; some evidence for choroid plexus transport",
+      "pmid": null
+    },
+    "csf_blood_ratio": 0.05,
+    "renal_clearance": false,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["FGFR1", "FGFR2"],
+    "serum_binding_proteins": ["heparan sulfate proteoglycans"],
+    "bioavailability_notes": "ECM sequestration dramatically reduces bioavailable fraction; heparin protects from degradation"
+  },
+  "IGF1": {
+    "molecular_weight_kda": 7.6,
+    "plasma_half_life_hours": 11.0,
+    "half_life_source": "literature",
+    "half_life_route": "SC",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "IGF1R-mediated transcytosis; enhanced during exercise and neuroinflammation; choroid plexus transport",
+      "evidence_level": "established",
+      "notes": "One of the best-characterized protein transporters across BBB; CSF/serum ratio ~0.5-1% for free IGF1",
+      "pmid": "23393180"
+    },
+    "csf_blood_ratio": 0.005,
+    "renal_clearance": false,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["IGF1R", "IGF2R"],
+    "serum_binding_proteins": ["IGFBP1", "IGFBP2", "IGFBP3", "IGFBP4", "IGFBP5", "IGFBP6"],
+    "bioavailability_notes": ">99% of circulating IGF1 is bound to IGFBPs; bound form extends half-life to 12-15h vs <30min for free"
+  },
+  "PDGFB": {
+    "molecular_weight_kda": 12.3,
+    "plasma_half_life_hours": 1.5,
+    "half_life_source": "estimate",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "PDGF-BB produced by pericytes locally; systemic delivery does not reach CNS",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["PDGFRB"],
+    "serum_binding_proteins": ["alpha2-macroglobulin"],
+    "bioavailability_notes": "Strong ECM binding; local effects dominate"
+  },
+  "ANGPT1": {
+    "molecular_weight_kda": 57.5,
+    "plasma_half_life_hours": 1.5,
+    "half_life_source": "estimate",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Large protein; primarily stabilizes vasculature via Tie2 on endothelium; does not cross",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["TIE2"],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Multimerizes for activity; matrix binding restricts systemic distribution"
+  },
+  "BDNF": {
+    "molecular_weight_kda": 13.5,
+    "plasma_half_life_hours": 1.0,
+    "half_life_source": "literature",
+    "half_life_route": "IV/peripheral",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "TrkB receptor-mediated transcytosis at blood-brain barrier; saturable transport",
+      "evidence_level": "established",
+      "notes": "Well-established BBB crossing; CSF/serum ratio ~0.5%; longer effective CNS half-life due to TrkB binding; platelets are major source of plasma BDNF",
+      "pmid": "19931479"
+    },
+    "csf_blood_ratio": 0.005,
+    "renal_clearance": false,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["NTRK2", "NGFR"],
+    "serum_binding_proteins": ["proBDNF processing proteins"],
+    "bioavailability_notes": "Platelet-derived BDNF accounts for most serum BDNF; peripheral vs CNS pools have different dynamics"
+  },
+  "NGF": {
+    "molecular_weight_kda": 13.3,
+    "plasma_half_life_hours": 0.5,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "TrkA receptor-mediated transcytosis; retrograde axonal transport in peripheral neurons",
+      "evidence_level": "established",
+      "notes": "BBB crossing is limited but established; retrograde transport from periphery to CNS is physiologically important",
+      "pmid": "19931479"
+    },
+    "csf_blood_ratio": 0.002,
+    "renal_clearance": true,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["NTRK1", "NGFR"],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Very short plasma half-life; local delivery or slow-release formulation required for therapeutic use"
+  },
+  "GDNF": {
+    "molecular_weight_kda": 15.1,
+    "plasma_half_life_hours": 3.0,
+    "half_life_source": "estimate",
+    "half_life_route": "estimate",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "Limited crossing via heparan sulfate binding to endothelial cells; primarily produced locally in CNS",
+      "evidence_level": "probable",
+      "notes": "Poor peripheral-to-CNS delivery; direct CNS administration (ICV, intranigral) required for Parkinson therapy",
+      "pmid": "23540597"
+    },
+    "csf_blood_ratio": 0.002,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["GFRA1", "RET"],
+    "serum_binding_proteins": ["heparan sulfate proteoglycans"],
+    "bioavailability_notes": "Peripheral delivery is poorly translated to CNS effects; local CNS delivery is standard for therapeutic use"
+  },
+  "CXCL12": {
+    "molecular_weight_kda": 8.0,
+    "plasma_half_life_hours": 0.75,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Primarily chemotactic in periphery; creates gradients for cell homing; degraded by CD26/DPP4",
+      "pmid": null
+    },
+    "csf_blood_ratio": 0.1,
+    "renal_clearance": true,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["CXCR4", "CXCR7"],
+    "serum_binding_proteins": ["heparan sulfate proteoglycans"],
+    "bioavailability_notes": "DPP4 rapidly cleaves N-terminal residue reducing receptor binding; form-specific half-life differs"
+  },
+  "MMP2": {
+    "molecular_weight_kda": 72.0,
+    "plasma_half_life_hours": 4.0,
+    "half_life_source": "literature",
+    "half_life_route": "systemic",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": "Does not cross intact BBB; degrades BBB components (collagen IV, laminin) disrupting integrity",
+      "evidence_level": "established",
+      "notes": "Important role in pathological BBB disruption in stroke, glioma; systemic administration does not reach CNS",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": [],
+    "serum_binding_proteins": ["TIMP1", "TIMP2", "alpha2-macroglobulin"],
+    "bioavailability_notes": "Mostly circulates as inactive pro-MMP2; TIMP2-mediated activation at cell surface"
+  },
+  "MMP9": {
+    "molecular_weight_kda": 78.4,
+    "plasma_half_life_hours": 3.0,
+    "half_life_source": "estimate",
+    "half_life_route": "systemic",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Contributes to BBB disruption in neuroinflammation; does not cross intact BBB",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": [],
+    "serum_binding_proteins": ["TIMP1", "alpha2-macroglobulin"],
+    "bioavailability_notes": "Rapidly inhibited by TIMPs; primarily acts at ECM"
+  },
+  "TIMP1": {
+    "molecular_weight_kda": 28.5,
+    "plasma_half_life_hours": 2.0,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Some evidence for direct receptor signaling beyond MMP inhibition; no established BBB transport",
+      "pmid": null
+    },
+    "csf_blood_ratio": 0.1,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": [],
+    "serum_binding_proteins": ["pro-MMP9"],
+    "bioavailability_notes": "Binds tightly to pro-MMP9; complex has different kinetics than free TIMP1"
+  },
+  "SERPINE1": {
+    "molecular_weight_kda": 45.0,
+    "plasma_half_life_hours": 1.5,
+    "half_life_source": "literature",
+    "half_life_route": "systemic",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Primarily acts in coagulation cascade; no CNS transport established",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["uPAR", "LRP1"],
+    "serum_binding_proteins": ["vitronectin"],
+    "bioavailability_notes": "Rapid inactivation after forming complexes with target proteases; LDL-receptor clears complexes"
+  },
+  "GDF15": {
+    "molecular_weight_kda": 25.0,
+    "plasma_half_life_hours": 3.0,
+    "half_life_source": "estimate",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "GFRAL receptor expressed in area postrema (outside BBB); induces nausea/anorexia via vagal nerve",
+      "evidence_level": "established",
+      "notes": "GFRAL receptor is exclusively in hindbrain area postrema where BBB is absent; primary CNS-relevant signaling",
+      "pmid": "26276051"
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["GFRAL"],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Circulates as stable homodimer; good plasma stability; therapeutic use in metabolic disease"
+  },
+  "CST3": {
+    "molecular_weight_kda": 13.3,
+    "plasma_half_life_hours": 3.0,
+    "half_life_source": "estimate",
+    "half_life_route": "systemic",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "Small protein; crosses via choroid plexus; CSF levels much higher than plasma indicating CNS production",
+      "evidence_level": "established",
+      "notes": "Primarily produced in CNS; plasma cystatin C used as GFR marker; CSF levels reflect CNS production",
+      "pmid": null
+    },
+    "csf_blood_ratio": 5.0,
+    "renal_clearance": true,
+    "is_glycosylated": false,
+    "active_transport_receptors": [],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Freely filtered by kidney; primary use as GFR biomarker"
+  },
+  "TGFB2": {
+    "molecular_weight_kda": 47.7,
+    "plasma_half_life_hours": 3.0,
+    "half_life_source": "estimate",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Large protein; latent complex limits bioavailability; local CNS production relevant",
+      "pmid": null
+    },
+    "csf_blood_ratio": 0.2,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": [],
+    "serum_binding_proteins": ["LTBP1", "alpha2-macroglobulin"],
+    "bioavailability_notes": "Abundant in CSF; primarily expressed by CNS cells locally"
+  },
+  "FGF21": {
+    "molecular_weight_kda": 22.3,
+    "plasma_half_life_hours": 2.0,
+    "half_life_source": "literature",
+    "half_life_route": "IV/SC",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "FGFR1c/KLB receptor complex expressed on brain endothelium and hypothalamus; direct CNS access",
+      "evidence_level": "established",
+      "notes": "Direct access to hypothalamus via fenestrated capillaries; mediates metabolic and circadian effects",
+      "pmid": "23071195"
+    },
+    "csf_blood_ratio": 0.01,
+    "renal_clearance": false,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["FGFR1c", "KLB"],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Engineered FGF21 variants with extended half-life used therapeutically; natural form rapidly cleared"
+  },
+  "LEP": {
+    "molecular_weight_kda": 16.0,
+    "plasma_half_life_hours": 0.5,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "Saturable transport via leptin receptor (LepRa) at choroid plexus and brain microvasculature",
+      "evidence_level": "established",
+      "notes": "Transport is saturable — explains leptin resistance in obesity despite high plasma levels",
+      "pmid": "21613458"
+    },
+    "csf_blood_ratio": 0.003,
+    "renal_clearance": true,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["LEPR"],
+    "serum_binding_proteins": ["soluble LEPR"],
+    "bioavailability_notes": "Receptor-mediated transport is saturable; therapeutic implications for obesity"
+  },
+  "INS": {
+    "molecular_weight_kda": 5.8,
+    "plasma_half_life_hours": 0.1,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "Insulin receptor (InsR)-mediated transcytosis at brain endothelium; saturable",
+      "evidence_level": "established",
+      "notes": "Brain insulin signaling modulates cognition and metabolism; transport is saturable in insulin resistance",
+      "pmid": "21613458"
+    },
+    "csf_blood_ratio": 0.01,
+    "renal_clearance": true,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["INSR"],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Degraded by insulin-degrading enzyme (IDE) in liver; very short half-life requires continuous delivery"
+  },
+  "ADIPOQ": {
+    "molecular_weight_kda": 26.4,
+    "plasma_half_life_hours": 8.0,
+    "half_life_source": "estimate",
+    "half_life_route": "systemic",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "AdipoR1/R2 expressed in hypothalamus and hippocampus; globular form crosses more readily than full-length",
+      "evidence_level": "probable",
+      "notes": "Globular adiponectin has better CNS access; full-length form limited by size",
+      "pmid": "21613458"
+    },
+    "csf_blood_ratio": 0.001,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["ADIPOR1", "ADIPOR2"],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Circulates as multiple oligomeric forms with different biological activities; HMW form has longest half-life"
+  },
+  "POSTN": {
+    "molecular_weight_kda": 93.3,
+    "plasma_half_life_hours": 6.0,
+    "half_life_source": "estimate",
+    "half_life_route": "systemic",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Large ECM protein; primarily acts at tissue matrix; no CNS transport",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["integrins"],
+    "serum_binding_proteins": ["fibronectin", "tenascin"],
+    "bioavailability_notes": "ECM-binding protein; plasma levels reflect tissue remodeling; local action"
+  },
+  "MMP1": {
+    "molecular_weight_kda": 54.0,
+    "plasma_half_life_hours": 3.0,
+    "half_life_source": "estimate",
+    "half_life_route": "systemic",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Acts primarily on ECM; no CNS transport; relevant in pathological BBB disruption",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": [],
+    "serum_binding_proteins": ["TIMP1", "alpha2-macroglobulin"],
+    "bioavailability_notes": "Inhibited by TIMPs; pro-enzyme requires activation"
+  },
+  "SPARC": {
+    "molecular_weight_kda": 34.6,
+    "plasma_half_life_hours": 4.0,
+    "half_life_source": "estimate",
+    "half_life_route": "systemic",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unknown",
+      "notes": "Matrix-associated protein; limited data on CNS transport",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": [],
+    "serum_binding_proteins": ["albumin", "thrombospondin"],
+    "bioavailability_notes": "Albumin-bound fraction affects distribution; involved in ECM remodeling"
+  },
+  "CCL2": {
+    "molecular_weight_kda": 8.6,
+    "plasma_half_life_hours": 0.5,
+    "half_life_source": "estimate",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "CCR2-mediated transport; significantly increased with neuroinflammation",
+      "evidence_level": "probable",
+      "notes": "Important in recruiting monocytes into CNS in neuroinflammatory conditions",
+      "pmid": null
+    },
+    "csf_blood_ratio": 0.05,
+    "renal_clearance": true,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["CCR2"],
+    "serum_binding_proteins": ["heparan sulfate proteoglycans"],
+    "bioavailability_notes": "ECM binding creates chemotactic gradients; short systemic half-life"
+  },
+  "CXCL1": {
+    "molecular_weight_kda": 7.8,
+    "plasma_half_life_hours": 0.5,
+    "half_life_source": "estimate",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Primarily neutrophil chemoattractant; no established CNS transport",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": true,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["CXCR2"],
+    "serum_binding_proteins": ["heparan sulfate proteoglycans"],
+    "bioavailability_notes": "Short half-life; ECM sequestration"
+  },
+  "GH1": {
+    "molecular_weight_kda": 22.1,
+    "plasma_half_life_hours": 0.3,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "GH receptor (GHR) expressed in choroid plexus and hypothalamus; saturable transport",
+      "evidence_level": "established",
+      "notes": "Hypothalamic GH receptors regulate IGF1 production; direct CNS GH effects on cognition",
+      "pmid": "21613458"
+    },
+    "csf_blood_ratio": 0.01,
+    "renal_clearance": false,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["GHR"],
+    "serum_binding_proteins": ["GHBP (GH binding protein)"],
+    "bioavailability_notes": "Pulsatile secretion pattern; GHBP extends effective half-life; multiple isoforms"
+  },
+  "EPO": {
+    "molecular_weight_kda": 18.4,
+    "plasma_half_life_hours": 6.5,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": true,
+      "mechanism": "EPOR expressed on brain microvascular endothelium; receptor-mediated transcytosis; neuroprotective",
+      "evidence_level": "established",
+      "notes": "Neuroprotective EPO signaling in stroke and TBI; CNS delivery requires high doses due to saturable transport",
+      "pmid": "21613458"
+    },
+    "csf_blood_ratio": 0.001,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["EPOR"],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Glycosylation critical for plasma stability; darbepoetin alpha has extended t1/2 via additional glycosylation"
+  },
+  "HGF": {
+    "molecular_weight_kda": 83.0,
+    "plasma_half_life_hours": 3.5,
+    "half_life_source": "literature",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Large protein does not cross intact BBB; MET receptor expressed in brain but reached via local production",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["MET"],
+    "serum_binding_proteins": ["heparan sulfate proteoglycans"],
+    "bioavailability_notes": "ECM binding limits bioavailability; local production in CNS relevant"
+  },
+  "PDGFA": {
+    "molecular_weight_kda": 23.9,
+    "plasma_half_life_hours": 1.0,
+    "half_life_source": "estimate",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "PDGF-AA primarily activates oligodendrocyte progenitors locally; no established BBB transport",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": false,
+    "active_transport_receptors": ["PDGFRA"],
+    "serum_binding_proteins": ["alpha2-macroglobulin"],
+    "bioavailability_notes": "Short plasma half-life; ECM sequestration"
+  },
+  "NRG1": {
+    "molecular_weight_kda": 70.0,
+    "plasma_half_life_hours": 2.0,
+    "half_life_source": "estimate",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Large transmembrane protein shed as soluble form; some isoforms have better access; ErbB4 expressed in CNS",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["ERBB3", "ERBB4"],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Multiple isoforms with different shedding patterns; neuregulin-1 type III is membrane-tethered"
+  },
+  "THBS1": {
+    "molecular_weight_kda": 129.4,
+    "plasma_half_life_hours": 2.0,
+    "half_life_source": "estimate",
+    "half_life_route": "systemic",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "Large oligomeric protein; no established BBB transport",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["CD36", "CD47", "integrins"],
+    "serum_binding_proteins": [],
+    "bioavailability_notes": "Stored in platelet alpha-granules; released on activation; primarily paracrine"
+  },
+  "BMP2": {
+    "molecular_weight_kda": 26.3,
+    "plasma_half_life_hours": 2.0,
+    "half_life_source": "estimate",
+    "half_life_route": "IV",
+    "bbb_penetration": {
+      "crosses_bbb": false,
+      "mechanism": null,
+      "evidence_level": "unlikely",
+      "notes": "ECM-binding protein; local delivery required for therapeutic effects; does not effectively cross BBB",
+      "pmid": null
+    },
+    "csf_blood_ratio": null,
+    "renal_clearance": false,
+    "is_glycosylated": true,
+    "active_transport_receptors": ["BMPR1A", "BMPR1B", "BMPR2"],
+    "serum_binding_proteins": ["noggin", "chordin", "follistatin"],
+    "bioavailability_notes": "Rapidly sequestered by antagonists; local delivery with carrier matrix required"
+  }
+}

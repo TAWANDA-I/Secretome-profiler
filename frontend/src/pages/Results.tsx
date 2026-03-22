@@ -12,10 +12,14 @@ import { SignalpPanel } from "@/components/results/SignalpPanel";
 import { HpaPanel } from "@/components/results/HpaPanel";
 import { SummaryPanel } from "@/components/results/SummaryPanel";
 import { TherapeuticTab } from "@/components/results/TherapeuticTab";
+import ConcentrationsTab from "@/components/results/ConcentrationsTab";
+import PharmacokineticTab from "@/components/results/PharmacokineticTab";
 import type { Result } from "@/types";
 
 // Phase 2 modules are rendered together in a single composite tab
 const PHASE2_MODULES = new Set(["therapeutic", "receptor_ligand", "safety", "disease_context"]);
+// Phase 3 modules have their own dedicated tabs
+const PHASE3_MODULES = new Set(["pk", "concentrations"]);
 
 const PANEL_MAP: Record<string, ComponentType<{ result: Result }>> = {
   uniprot:   UniprotPanel,
@@ -36,6 +40,8 @@ const TAB_LABELS: Record<string, string> = {
   hpa:              "HPA",
   comparison:       "Comparison",
   therapeutic_view: "Therapeutic",
+  pk:               "Pharmacokinetics",
+  concentrations:   "Concentrations",
 };
 
 export default function Results() {
@@ -67,11 +73,17 @@ export default function Results() {
 
   // Separate Phase 2 modules into a single composite "Therapeutic" tab
   const hasPhase2 = results.some((r: Result) => PHASE2_MODULES.has(r.module_name));
-  const phase1Results = results.filter((r: Result) => !PHASE2_MODULES.has(r.module_name));
+  const hasPK = results.some((r: Result) => r.module_name === "pk");
+  const hasConcentrations = results.some((r: Result) => r.module_name === "concentrations");
+  const phase1Results = results.filter(
+    (r: Result) => !PHASE2_MODULES.has(r.module_name) && !PHASE3_MODULES.has(r.module_name)
+  );
   const tabs = [
     "summary",
     ...phase1Results.map((r: Result) => r.module_name),
     ...(hasPhase2 ? ["therapeutic_view"] : []),
+    ...(hasPK ? ["pk"] : []),
+    ...(hasConcentrations ? ["concentrations"] : []),
   ];
 
   const activeResult = results.find((r: Result) => r.module_name === activeTab);
@@ -125,6 +137,10 @@ export default function Results() {
           safetyResult={safetyResult}
           diseaseContextResult={diseaseContextResult}
         />
+      ) : activeTab === "pk" ? (
+        <PKTabLoader jobId={jobId!} />
+      ) : activeTab === "concentrations" ? (
+        <ConcentrationsTabLoader jobId={jobId!} />
       ) : Panel && activeResult ? (
         <Panel result={activeResult} />
       ) : (
@@ -144,6 +160,26 @@ export default function Results() {
       )}
     </div>
   );
+}
+
+function PKTabLoader({ jobId }: { jobId: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["module_data", jobId, "pk"],
+    queryFn: () => resultsApi.getModuleData(jobId, "pk"),
+  });
+  if (isLoading) return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
+  if (!data) return <div className="text-center py-8 text-gray-400 text-sm">No pharmacokinetic data available.</div>;
+  return <PharmacokineticTab data={data as Parameters<typeof PharmacokineticTab>[0]["data"]} />;
+}
+
+function ConcentrationsTabLoader({ jobId }: { jobId: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["module_data", jobId, "concentrations"],
+    queryFn: () => resultsApi.getModuleData(jobId, "concentrations"),
+  });
+  if (isLoading) return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
+  if (!data) return <div className="text-center py-8 text-gray-400 text-sm">No concentration data available.</div>;
+  return <ConcentrationsTab data={data as Parameters<typeof ConcentrationsTab>[0]["data"]} />;
 }
 
 function DownloadButton({ jobId, moduleName }: { jobId: string; moduleName: string }) {

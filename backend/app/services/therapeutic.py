@@ -189,12 +189,41 @@ def _gene_names_from_uniprot(uniprot_data: dict[str, Any]) -> set[str]:
     return names
 
 
+# Indications that benefit from BBB-crossing proteins
+_BBB_RELEVANT_INDICATIONS = {"neuroregeneration"}
+
+
+def _build_pk_lookup(pk_data: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
+    """Return gene -> pk_entry mapping from pk_analysis output."""
+    if not pk_data:
+        return {}
+    return {p["gene"].upper(): p for p in pk_data.get("proteins", []) if p.get("gene")}
+
+
+def _build_conc_lookup(
+    protein_concentrations: dict[str, float] | None,
+) -> dict[str, float]:
+    """Return upper-cased gene -> concentration mapping."""
+    if not protein_concentrations:
+        return {}
+    return {g.upper(): v for g, v in protein_concentrations.items()}
+
+
 def score_therapeutic_indications(
     proteins: list[str],
     uniprot_data: dict[str, Any],
+    pk_data: dict[str, Any] | None = None,
+    protein_concentrations: dict[str, float] | None = None,
 ) -> dict[str, Any]:
     """
     Score the secretome against all therapeutic indications.
+
+    Optional modifiers when pk_data / protein_concentrations are provided:
+    - Short half-life penalty: positive hits with t½ < 6 h each reduce score by 0.15
+    - BBB bonus: for neurological indications, established/probable BBB-crossing
+      positive hits each add 0.2 to the score
+    - Concentration weighting: supra-physiological positive hits add 0.1 each;
+      potentially-toxic positive hits subtract 0.2 each
 
     Returns a dict with:
       indications: list of ranked indication objects
@@ -202,9 +231,11 @@ def score_therapeutic_indications(
       overall_confidence: "High"/"Moderate"/"Low"
     """
     gene_names = _gene_names_from_uniprot(uniprot_data)
-    # Fallback: if no uniprot data, treat protein IDs themselves as gene names
     if not gene_names:
         gene_names = {p.upper() for p in proteins}
+
+    pk_lookup = _build_pk_lookup(pk_data)
+    conc_lookup = _build_conc_lookup(protein_concentrations)
 
     scored: list[dict[str, Any]] = []
     for ind_key, ind in INDICATIONS.items():
@@ -215,7 +246,40 @@ def score_therapeutic_indications(
 
         # Network coherence bonus: if >3 positive hits, small bonus
         coherence_bonus = 0.3 if len(positive_hits) > 3 else 0.0
-        final_score = max(0.0, raw_score + coherence_bonus)
+
+        # ── PK modifiers ──────────────────────────────────────────────────────
+        pk_modifier = 0.0
+        if pk_lookup:
+            for gene in positive_hits:
+                pk_entry = pk_lookup.get(gene)
+                if not pk_entry:
+                    continue
+                t_half = pk_entry.get("plasma_half_life_hours")
+                # Short half-life penalty (< 6 h)
+                if t_half is not None and t_half < 6.0:
+                    pk_modifier -= 0.15
+                # BBB bonus for neurological indications
+                if ind_key in _BBB_RELEVANT_INDICATIONS:
+                    bbb = pk_entry.get("bbb_penetration") or {}
+                    ev = bbb.get("evidence_level", "unknown")
+                    if ev in ("established", "probable"):
+                        pk_modifier += 0.2
+
+        # ── Concentration modifiers ───────────────────────────────────────────
+        conc_modifier = 0.0
+        if conc_lookup:
+            for gene in positive_hits:
+                conc = conc_lookup.get(gene)
+                if conc is None:
+                    continue
+                # Classify relative to plasma reference if available
+                status = pk_lookup.get(gene, {}).get("concentration_status", "")
+                if status == "supra_physiological":
+                    conc_modifier += 0.1
+                elif status == "potentially_toxic":
+                    conc_modifier -= 0.2
+
+        final_score = max(0.0, raw_score + coherence_bonus + pk_modifier + conc_modifier)
 
         # Confidence from positive hit fraction
         max_possible = len(ind["positive"]) or 1

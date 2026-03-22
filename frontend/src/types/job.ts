@@ -12,7 +12,9 @@ export type ModuleName =
   | "therapeutic"
   | "receptor_ligand"
   | "safety"
-  | "disease_context";
+  | "disease_context"
+  | "pk"
+  | "concentrations";
 
 export interface ModuleProgress {
   status: JobStatus;
@@ -33,6 +35,7 @@ export interface Job {
   proteins_b: string[] | null;
   set_a_label: string | null;
   set_b_label: string | null;
+  protein_concentrations: Record<string, number> | null;
   created_at: string;
   updated_at: string;
 }
@@ -54,6 +57,8 @@ export interface JobCreate {
   proteins?: string[];
   modules?: ModuleName[];
   label?: string;
+  // optional quantitative concentrations
+  protein_concentrations?: Record<string, number>;
   // comparison mode
   set_a_proteins?: string[];
   set_a_label?: string;

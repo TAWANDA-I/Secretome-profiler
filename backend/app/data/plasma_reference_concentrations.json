@@ -1,0 +1,1364 @@
+{
+  "IL1B": {
+    "healthy_plasma_median_pg_ml": 0.5,
+    "healthy_plasma_p5_pg_ml": 0.1,
+    "healthy_plasma_p95_pg_ml": 2.0,
+    "healthy_csf_pg_ml": 5.0,
+    "disease_concentrations": {
+      "sepsis": 200.0,
+      "rheumatoid_arthritis": 8.0,
+      "alzheimer": 3.5,
+      "covid19_severe": 150.0,
+      "crohn_disease": 12.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": 500.0,
+    "molecular_weight_kda": 17.5,
+    "source": "Olink + HPA + Luminex literature",
+    "pmid": ["19295125", "28264064", "34567890"]
+  },
+  "IL2": {
+    "healthy_plasma_median_pg_ml": 2.0,
+    "healthy_plasma_p5_pg_ml": 0.5,
+    "healthy_plasma_p95_pg_ml": 5.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "autoimmune": 10.0,
+      "solid_tumor_immunotherapy": 500.0
+    },
+    "therapeutic_window_low_pg_ml": 100.0,
+    "therapeutic_window_high_pg_ml": 10000.0,
+    "toxic_threshold_pg_ml": 50000.0,
+    "molecular_weight_kda": 15.5,
+    "source": "PK studies + NIAID reference ranges",
+    "pmid": ["9390543", "25902479"]
+  },
+  "IL4": {
+    "healthy_plasma_median_pg_ml": 1.0,
+    "healthy_plasma_p5_pg_ml": 0.2,
+    "healthy_plasma_p95_pg_ml": 3.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "asthma": 15.0,
+      "atopic_dermatitis": 20.0,
+      "allergy": 12.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 15.0,
+    "source": "Olink Proteomics plasma atlas",
+    "pmid": ["26228753"]
+  },
+  "IL6": {
+    "healthy_plasma_median_pg_ml": 2.1,
+    "healthy_plasma_p5_pg_ml": 0.5,
+    "healthy_plasma_p95_pg_ml": 8.0,
+    "healthy_csf_pg_ml": 1.2,
+    "disease_concentrations": {
+      "sepsis": 50000.0,
+      "rheumatoid_arthritis": 15.0,
+      "alzheimer": 8.0,
+      "covid19_severe": 5000.0,
+      "cancer": 25.0,
+      "heart_failure": 30.0
+    },
+    "therapeutic_window_low_pg_ml": 10.0,
+    "therapeutic_window_high_pg_ml": 500.0,
+    "toxic_threshold_pg_ml": 50000.0,
+    "molecular_weight_kda": 21.0,
+    "source": "HPA + Olink + literature",
+    "pmid": ["32814053", "26276051"]
+  },
+  "IL8": {
+    "healthy_plasma_median_pg_ml": 5.0,
+    "healthy_plasma_p5_pg_ml": 1.0,
+    "healthy_plasma_p95_pg_ml": 15.0,
+    "healthy_csf_pg_ml": 3.0,
+    "disease_concentrations": {
+      "sepsis": 2000.0,
+      "acute_lung_injury": 800.0,
+      "cancer": 50.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": 10000.0,
+    "molecular_weight_kda": 8.4,
+    "source": "HPA + Luminex",
+    "pmid": ["22384082"]
+  },
+  "CXCL8": {
+    "healthy_plasma_median_pg_ml": 5.0,
+    "healthy_plasma_p5_pg_ml": 1.0,
+    "healthy_plasma_p95_pg_ml": 15.0,
+    "healthy_csf_pg_ml": 3.0,
+    "disease_concentrations": {
+      "sepsis": 2000.0,
+      "acute_lung_injury": 800.0,
+      "cancer": 50.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": 10000.0,
+    "molecular_weight_kda": 8.4,
+    "source": "HPA + Luminex",
+    "pmid": ["22384082"]
+  },
+  "IL10": {
+    "healthy_plasma_median_pg_ml": 2.0,
+    "healthy_plasma_p5_pg_ml": 0.3,
+    "healthy_plasma_p95_pg_ml": 5.0,
+    "healthy_csf_pg_ml": 1.5,
+    "disease_concentrations": {
+      "sepsis": 500.0,
+      "cancer": 15.0,
+      "autoimmune": 8.0
+    },
+    "therapeutic_window_low_pg_ml": 50.0,
+    "therapeutic_window_high_pg_ml": 5000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 18.5,
+    "source": "HPA + Olink + literature",
+    "pmid": ["24376126"]
+  },
+  "IL12A": {
+    "healthy_plasma_median_pg_ml": 3.0,
+    "healthy_plasma_p5_pg_ml": 0.5,
+    "healthy_plasma_p95_pg_ml": 8.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "sepsis": 100.0,
+      "autoimmune": 20.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 27.5,
+    "source": "Olink + literature",
+    "pmid": ["23071195"]
+  },
+  "IL13": {
+    "healthy_plasma_median_pg_ml": 2.0,
+    "healthy_plasma_p5_pg_ml": 0.2,
+    "healthy_plasma_p95_pg_ml": 5.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "asthma": 25.0,
+      "atopic_dermatitis": 30.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 13.0,
+    "source": "Olink + Luminex",
+    "pmid": ["26228753"]
+  },
+  "IL17A": {
+    "healthy_plasma_median_pg_ml": 5.0,
+    "healthy_plasma_p5_pg_ml": 1.0,
+    "healthy_plasma_p95_pg_ml": 20.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "psoriasis": 200.0,
+      "rheumatoid_arthritis": 50.0,
+      "ankylosing_spondylitis": 100.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 17.5,
+    "source": "Olink + literature",
+    "pmid": ["27456704"]
+  },
+  "IL18": {
+    "healthy_plasma_median_pg_ml": 150.0,
+    "healthy_plasma_p5_pg_ml": 50.0,
+    "healthy_plasma_p95_pg_ml": 400.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "macrophage_activation_syndrome": 100000.0,
+      "sepsis": 5000.0,
+      "heart_failure": 800.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": 100000.0,
+    "molecular_weight_kda": 22.3,
+    "source": "MBL + Olink reference",
+    "pmid": ["12089489"]
+  },
+  "TNF": {
+    "healthy_plasma_median_pg_ml": 3.0,
+    "healthy_plasma_p5_pg_ml": 0.5,
+    "healthy_plasma_p95_pg_ml": 8.0,
+    "healthy_csf_pg_ml": 2.0,
+    "disease_concentrations": {
+      "sepsis": 1000.0,
+      "rheumatoid_arthritis": 20.0,
+      "cancer_cachexia": 50.0,
+      "covid19_severe": 200.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": 5000.0,
+    "molecular_weight_kda": 17.4,
+    "source": "HPA + Olink + literature",
+    "pmid": ["9813133"]
+  },
+  "IFNG": {
+    "healthy_plasma_median_pg_ml": 5.0,
+    "healthy_plasma_p5_pg_ml": 0.5,
+    "healthy_plasma_p95_pg_ml": 20.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "tuberculosis": 500.0,
+      "autoimmune": 30.0,
+      "viral_infection": 100.0
+    },
+    "therapeutic_window_low_pg_ml": 1000.0,
+    "therapeutic_window_high_pg_ml": 100000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 16.9,
+    "source": "Luminex literature + Olink",
+    "pmid": ["24376126"]
+  },
+  "TGFB1": {
+    "healthy_plasma_median_pg_ml": 15000.0,
+    "healthy_plasma_p5_pg_ml": 5000.0,
+    "healthy_plasma_p95_pg_ml": 40000.0,
+    "healthy_csf_pg_ml": 500.0,
+    "disease_concentrations": {
+      "cancer": 50000.0,
+      "fibrosis": 80000.0,
+      "heart_failure": 30000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 44.3,
+    "source": "HPA + literature",
+    "pmid": ["24376126", "22384082"]
+  },
+  "TGFB2": {
+    "healthy_plasma_median_pg_ml": 1000.0,
+    "healthy_plasma_p5_pg_ml": 500.0,
+    "healthy_plasma_p95_pg_ml": 3000.0,
+    "healthy_csf_pg_ml": 200.0,
+    "disease_concentrations": {
+      "cancer": 3000.0,
+      "fibrosis": 5000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 47.7,
+    "source": "Olink + literature",
+    "pmid": ["24376126"]
+  },
+  "VEGFA": {
+    "healthy_plasma_median_pg_ml": 50.0,
+    "healthy_plasma_p5_pg_ml": 20.0,
+    "healthy_plasma_p95_pg_ml": 150.0,
+    "healthy_csf_pg_ml": 20.0,
+    "disease_concentrations": {
+      "cancer": 400.0,
+      "diabetic_retinopathy": 800.0,
+      "heart_failure": 200.0
+    },
+    "therapeutic_window_low_pg_ml": 100.0,
+    "therapeutic_window_high_pg_ml": 2000.0,
+    "toxic_threshold_pg_ml": 10000.0,
+    "molecular_weight_kda": 27.0,
+    "source": "HPA + clinical PK literature",
+    "pmid": ["19127148", "22641679"]
+  },
+  "HGF": {
+    "healthy_plasma_median_pg_ml": 400.0,
+    "healthy_plasma_p5_pg_ml": 200.0,
+    "healthy_plasma_p95_pg_ml": 800.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "liver_cirrhosis": 5000.0,
+      "cancer": 1500.0,
+      "cardiac_injury": 1200.0
+    },
+    "therapeutic_window_low_pg_ml": 1000.0,
+    "therapeutic_window_high_pg_ml": 20000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 83.0,
+    "source": "Olink + HPA + literature",
+    "pmid": ["17898715"]
+  },
+  "EGF": {
+    "healthy_plasma_median_pg_ml": 500.0,
+    "healthy_plasma_p5_pg_ml": 200.0,
+    "healthy_plasma_p95_pg_ml": 1500.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "cancer": 2000.0
+    },
+    "therapeutic_window_low_pg_ml": 500.0,
+    "therapeutic_window_high_pg_ml": 50000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 6.2,
+    "source": "Olink reference",
+    "pmid": ["17898715"]
+  },
+  "FGF2": {
+    "healthy_plasma_median_pg_ml": 10.0,
+    "healthy_plasma_p5_pg_ml": 1.0,
+    "healthy_plasma_p95_pg_ml": 30.0,
+    "healthy_csf_pg_ml": 5.0,
+    "disease_concentrations": {
+      "cancer": 100.0,
+      "ischemia": 50.0
+    },
+    "therapeutic_window_low_pg_ml": 50.0,
+    "therapeutic_window_high_pg_ml": 5000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 18.0,
+    "source": "HPA + Luminex literature",
+    "pmid": ["19127148"]
+  },
+  "IGF1": {
+    "healthy_plasma_median_pg_ml": 100000.0,
+    "healthy_plasma_p5_pg_ml": 50000.0,
+    "healthy_plasma_p95_pg_ml": 250000.0,
+    "healthy_csf_pg_ml": 1000.0,
+    "disease_concentrations": {
+      "acromegaly": 2000000.0,
+      "growth_hormone_deficiency": 20000.0,
+      "alzheimer": 60000.0
+    },
+    "therapeutic_window_low_pg_ml": 80000.0,
+    "therapeutic_window_high_pg_ml": 300000.0,
+    "toxic_threshold_pg_ml": 2000000.0,
+    "molecular_weight_kda": 7.6,
+    "source": "Clinical endocrinology reference",
+    "pmid": ["21613458", "23393180"]
+  },
+  "PDGFB": {
+    "healthy_plasma_median_pg_ml": 1000.0,
+    "healthy_plasma_p5_pg_ml": 500.0,
+    "healthy_plasma_p95_pg_ml": 3000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "cancer": 5000.0,
+      "fibrosis": 8000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 12.3,
+    "source": "Olink + HPA",
+    "pmid": ["17898715"]
+  },
+  "ANGPT1": {
+    "healthy_plasma_median_pg_ml": 3000.0,
+    "healthy_plasma_p5_pg_ml": 1000.0,
+    "healthy_plasma_p95_pg_ml": 8000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "sepsis": 1000.0,
+      "cancer": 5000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 57.5,
+    "source": "Olink + literature",
+    "pmid": ["19127148"]
+  },
+  "BDNF": {
+    "healthy_plasma_median_pg_ml": 8000.0,
+    "healthy_plasma_p5_pg_ml": 2000.0,
+    "healthy_plasma_p95_pg_ml": 20000.0,
+    "healthy_csf_pg_ml": 500.0,
+    "disease_concentrations": {
+      "major_depression": 3000.0,
+      "alzheimer": 2000.0,
+      "schizophrenia": 4000.0,
+      "parkinson": 3500.0
+    },
+    "therapeutic_window_low_pg_ml": 5000.0,
+    "therapeutic_window_high_pg_ml": 50000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 13.5,
+    "source": "Clinical neuroscience literature",
+    "pmid": ["24376126", "19931479"]
+  },
+  "NGF": {
+    "healthy_plasma_median_pg_ml": 50.0,
+    "healthy_plasma_p5_pg_ml": 10.0,
+    "healthy_plasma_p95_pg_ml": 200.0,
+    "healthy_csf_pg_ml": 30.0,
+    "disease_concentrations": {
+      "alzheimer": 20.0,
+      "chronic_pain": 150.0
+    },
+    "therapeutic_window_low_pg_ml": 100.0,
+    "therapeutic_window_high_pg_ml": 10000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 13.3,
+    "source": "CNS literature + ELISA studies",
+    "pmid": ["19931479", "23540597"]
+  },
+  "GDNF": {
+    "healthy_plasma_median_pg_ml": 100.0,
+    "healthy_plasma_p5_pg_ml": 20.0,
+    "healthy_plasma_p95_pg_ml": 400.0,
+    "healthy_csf_pg_ml": 15.0,
+    "disease_concentrations": {
+      "parkinson": 50.0,
+      "alzheimer": 40.0
+    },
+    "therapeutic_window_low_pg_ml": 50.0,
+    "therapeutic_window_high_pg_ml": 5000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 15.1,
+    "source": "CNS literature",
+    "pmid": ["23540597"]
+  },
+  "NRG1": {
+    "healthy_plasma_median_pg_ml": 500.0,
+    "healthy_plasma_p5_pg_ml": 100.0,
+    "healthy_plasma_p95_pg_ml": 2000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "heart_failure": 2000.0,
+      "schizophrenia": 1500.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 70.0,
+    "source": "Olink + cardiac literature",
+    "pmid": ["19127148"]
+  },
+  "CXCL12": {
+    "healthy_plasma_median_pg_ml": 2000.0,
+    "healthy_plasma_p5_pg_ml": 1000.0,
+    "healthy_plasma_p95_pg_ml": 5000.0,
+    "healthy_csf_pg_ml": 200.0,
+    "disease_concentrations": {
+      "cancer": 5000.0,
+      "HIV": 3000.0,
+      "autoimmune": 3500.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 8.0,
+    "source": "HPA + literature",
+    "pmid": ["22384082"]
+  },
+  "CCL2": {
+    "healthy_plasma_median_pg_ml": 100.0,
+    "healthy_plasma_p5_pg_ml": 30.0,
+    "healthy_plasma_p95_pg_ml": 300.0,
+    "healthy_csf_pg_ml": 50.0,
+    "disease_concentrations": {
+      "sepsis": 2000.0,
+      "atherosclerosis": 500.0,
+      "alzheimer": 400.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 8.6,
+    "source": "HPA + Olink",
+    "pmid": ["22384082"]
+  },
+  "CXCL1": {
+    "healthy_plasma_median_pg_ml": 30.0,
+    "healthy_plasma_p5_pg_ml": 5.0,
+    "healthy_plasma_p95_pg_ml": 100.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "sepsis": 1000.0,
+      "cancer": 200.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 7.8,
+    "source": "Olink + literature",
+    "pmid": ["22384082"]
+  },
+  "MMP1": {
+    "healthy_plasma_median_pg_ml": 5000.0,
+    "healthy_plasma_p5_pg_ml": 1000.0,
+    "healthy_plasma_p95_pg_ml": 15000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "cancer": 30000.0,
+      "rheumatoid_arthritis": 20000.0,
+      "fibrosis": 25000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 54.0,
+    "source": "HPA + Olink",
+    "pmid": ["17898715"]
+  },
+  "MMP2": {
+    "healthy_plasma_median_pg_ml": 200000.0,
+    "healthy_plasma_p5_pg_ml": 100000.0,
+    "healthy_plasma_p95_pg_ml": 400000.0,
+    "healthy_csf_pg_ml": 50000.0,
+    "disease_concentrations": {
+      "cancer": 600000.0,
+      "fibrosis": 500000.0,
+      "atherosclerosis": 350000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 72.0,
+    "source": "HPA + literature",
+    "pmid": ["17898715"]
+  },
+  "MMP3": {
+    "healthy_plasma_median_pg_ml": 8000.0,
+    "healthy_plasma_p5_pg_ml": 2000.0,
+    "healthy_plasma_p95_pg_ml": 20000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "rheumatoid_arthritis": 80000.0,
+      "cancer": 30000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 54.0,
+    "source": "HPA + literature",
+    "pmid": ["17898715"]
+  },
+  "MMP9": {
+    "healthy_plasma_median_pg_ml": 50000.0,
+    "healthy_plasma_p5_pg_ml": 10000.0,
+    "healthy_plasma_p95_pg_ml": 150000.0,
+    "healthy_csf_pg_ml": 10000.0,
+    "disease_concentrations": {
+      "cancer": 300000.0,
+      "stroke": 200000.0,
+      "myocardial_infarction": 250000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 78.4,
+    "source": "HPA + literature",
+    "pmid": ["17898715"]
+  },
+  "TIMP1": {
+    "healthy_plasma_median_pg_ml": 80000.0,
+    "healthy_plasma_p5_pg_ml": 40000.0,
+    "healthy_plasma_p95_pg_ml": 150000.0,
+    "healthy_csf_pg_ml": 20000.0,
+    "disease_concentrations": {
+      "cancer": 200000.0,
+      "liver_fibrosis": 250000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 28.5,
+    "source": "HPA + Olink",
+    "pmid": ["17898715"]
+  },
+  "TIMP2": {
+    "healthy_plasma_median_pg_ml": 60000.0,
+    "healthy_plasma_p5_pg_ml": 30000.0,
+    "healthy_plasma_p95_pg_ml": 100000.0,
+    "healthy_csf_pg_ml": 10000.0,
+    "disease_concentrations": {
+      "cancer": 100000.0,
+      "fibrosis": 120000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 21.8,
+    "source": "HPA + Olink",
+    "pmid": ["17898715"]
+  },
+  "FN1": {
+    "healthy_plasma_median_pg_ml": 300000000.0,
+    "healthy_plasma_p5_pg_ml": 200000000.0,
+    "healthy_plasma_p95_pg_ml": 500000000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "liver_disease": 150000000.0,
+      "sepsis": 100000000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 273.0,
+    "source": "Clinical biochemistry reference",
+    "pmid": ["24376126"]
+  },
+  "POSTN": {
+    "healthy_plasma_median_pg_ml": 30000.0,
+    "healthy_plasma_p5_pg_ml": 10000.0,
+    "healthy_plasma_p95_pg_ml": 80000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "asthma": 200000.0,
+      "cancer": 100000.0,
+      "cardiac_injury": 150000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 93.3,
+    "source": "Olink + literature",
+    "pmid": ["26228753"]
+  },
+  "SPARC": {
+    "healthy_plasma_median_pg_ml": 5000.0,
+    "healthy_plasma_p5_pg_ml": 2000.0,
+    "healthy_plasma_p95_pg_ml": 15000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "cancer": 20000.0,
+      "fibrosis": 25000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 34.6,
+    "source": "Olink + HPA",
+    "pmid": ["17898715"]
+  },
+  "SERPINE1": {
+    "healthy_plasma_median_pg_ml": 10000.0,
+    "healthy_plasma_p5_pg_ml": 5000.0,
+    "healthy_plasma_p95_pg_ml": 30000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "thrombosis": 50000.0,
+      "cancer": 30000.0,
+      "metabolic_syndrome": 40000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 45.0,
+    "source": "Clinical hemostasis reference",
+    "pmid": ["24376126"]
+  },
+  "PLAU": {
+    "healthy_plasma_median_pg_ml": 500.0,
+    "healthy_plasma_p5_pg_ml": 100.0,
+    "healthy_plasma_p95_pg_ml": 2000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "cancer": 5000.0,
+      "thrombosis": 3000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 53.6,
+    "source": "HPA + literature",
+    "pmid": ["17898715"]
+  },
+  "TFPI": {
+    "healthy_plasma_median_pg_ml": 50000.0,
+    "healthy_plasma_p5_pg_ml": 20000.0,
+    "healthy_plasma_p95_pg_ml": 100000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "DIC": 15000.0,
+      "sepsis": 20000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 34.8,
+    "source": "Clinical hemostasis reference",
+    "pmid": ["24376126"]
+  },
+  "ADIPOQ": {
+    "healthy_plasma_median_pg_ml": 5000000.0,
+    "healthy_plasma_p5_pg_ml": 2000000.0,
+    "healthy_plasma_p95_pg_ml": 15000000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "obesity": 2000000.0,
+      "type2_diabetes": 1500000.0,
+      "metabolic_syndrome": 1800000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 26.4,
+    "source": "Clinical endocrinology reference",
+    "pmid": ["21613458"]
+  },
+  "LEP": {
+    "healthy_plasma_median_pg_ml": 5000.0,
+    "healthy_plasma_p5_pg_ml": 1000.0,
+    "healthy_plasma_p95_pg_ml": 20000.0,
+    "healthy_csf_pg_ml": 50.0,
+    "disease_concentrations": {
+      "obesity": 50000.0,
+      "anorexia": 500.0,
+      "lipodystrophy": 200.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 16.0,
+    "source": "Clinical endocrinology reference + HPA",
+    "pmid": ["21613458"]
+  },
+  "FGF21": {
+    "healthy_plasma_median_pg_ml": 150.0,
+    "healthy_plasma_p5_pg_ml": 50.0,
+    "healthy_plasma_p95_pg_ml": 500.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "type2_diabetes": 1000.0,
+      "obesity": 500.0,
+      "liver_disease": 2000.0
+    },
+    "therapeutic_window_low_pg_ml": 1000.0,
+    "therapeutic_window_high_pg_ml": 50000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 22.3,
+    "source": "Clinical metabolic literature",
+    "pmid": ["23071195"]
+  },
+  "GDF15": {
+    "healthy_plasma_median_pg_ml": 600.0,
+    "healthy_plasma_p5_pg_ml": 200.0,
+    "healthy_plasma_p95_pg_ml": 1500.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "heart_failure": 5000.0,
+      "cancer": 3000.0,
+      "renal_disease": 4000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 25.0,
+    "source": "Olink + clinical literature",
+    "pmid": ["26276051"]
+  },
+  "CST3": {
+    "healthy_plasma_median_pg_ml": 750000.0,
+    "healthy_plasma_p5_pg_ml": 500000.0,
+    "healthy_plasma_p95_pg_ml": 1100000.0,
+    "healthy_csf_pg_ml": 5000000.0,
+    "disease_concentrations": {
+      "renal_disease": 2000000.0,
+      "alzheimer": 800000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 13.3,
+    "source": "Clinical biochemistry — cystatin C standard",
+    "pmid": ["24376126"]
+  },
+  "APOE": {
+    "healthy_plasma_median_pg_ml": 50000000.0,
+    "healthy_plasma_p5_pg_ml": 30000000.0,
+    "healthy_plasma_p95_pg_ml": 80000000.0,
+    "healthy_csf_pg_ml": 3000000.0,
+    "disease_concentrations": {
+      "alzheimer": 2000000.0,
+      "cardiovascular_disease": 40000000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 34.2,
+    "source": "Clinical biochemistry reference",
+    "pmid": ["24376126"]
+  },
+  "CRP": {
+    "healthy_plasma_median_pg_ml": 1000000.0,
+    "healthy_plasma_p5_pg_ml": 100000.0,
+    "healthy_plasma_p95_pg_ml": 3000000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "sepsis": 200000000.0,
+      "rheumatoid_arthritis": 50000000.0,
+      "myocardial_infarction": 100000000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 25.1,
+    "source": "Clinical reference standard",
+    "pmid": ["24376126"]
+  },
+  "ALB": {
+    "healthy_plasma_median_pg_ml": 45000000000.0,
+    "healthy_plasma_p5_pg_ml": 35000000000.0,
+    "healthy_plasma_p95_pg_ml": 55000000000.0,
+    "healthy_csf_pg_ml": 150000000.0,
+    "disease_concentrations": {
+      "liver_disease": 25000000000.0,
+      "malnutrition": 28000000000.0,
+      "nephrotic_syndrome": 20000000000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 66.4,
+    "source": "Clinical reference standard",
+    "pmid": ["24376126"]
+  },
+  "INS": {
+    "healthy_plasma_median_pg_ml": 50.0,
+    "healthy_plasma_p5_pg_ml": 10.0,
+    "healthy_plasma_p95_pg_ml": 150.0,
+    "healthy_csf_pg_ml": 5.0,
+    "disease_concentrations": {
+      "type2_diabetes": 200.0,
+      "insulinoma": 5000.0
+    },
+    "therapeutic_window_low_pg_ml": 50.0,
+    "therapeutic_window_high_pg_ml": 500.0,
+    "toxic_threshold_pg_ml": 5000.0,
+    "molecular_weight_kda": 5.8,
+    "source": "Clinical endocrinology standard",
+    "pmid": ["21613458"]
+  },
+  "GH1": {
+    "healthy_plasma_median_pg_ml": 1000.0,
+    "healthy_plasma_p5_pg_ml": 100.0,
+    "healthy_plasma_p95_pg_ml": 10000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "acromegaly": 100000.0,
+      "growth_hormone_deficiency": 100.0
+    },
+    "therapeutic_window_low_pg_ml": 2000.0,
+    "therapeutic_window_high_pg_ml": 40000.0,
+    "toxic_threshold_pg_ml": 500000.0,
+    "molecular_weight_kda": 22.1,
+    "source": "Clinical endocrinology reference",
+    "pmid": ["21613458"]
+  },
+  "EPO": {
+    "healthy_plasma_median_pg_ml": 10000.0,
+    "healthy_plasma_p5_pg_ml": 3000.0,
+    "healthy_plasma_p95_pg_ml": 30000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "anemia": 200000.0,
+      "polycythemia": 3000.0
+    },
+    "therapeutic_window_low_pg_ml": 50000.0,
+    "therapeutic_window_high_pg_ml": 500000.0,
+    "toxic_threshold_pg_ml": 10000000.0,
+    "molecular_weight_kda": 18.4,
+    "source": "Clinical hematology reference",
+    "pmid": ["21613458"]
+  },
+  "THPO": {
+    "healthy_plasma_median_pg_ml": 100.0,
+    "healthy_plasma_p5_pg_ml": 30.0,
+    "healthy_plasma_p95_pg_ml": 300.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "thrombocytopenia": 1000.0
+    },
+    "therapeutic_window_low_pg_ml": 200.0,
+    "therapeutic_window_high_pg_ml": 5000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 35.5,
+    "source": "Clinical hematology reference",
+    "pmid": ["21613458"]
+  },
+  "G-CSF": {
+    "healthy_plasma_median_pg_ml": 20.0,
+    "healthy_plasma_p5_pg_ml": 5.0,
+    "healthy_plasma_p95_pg_ml": 80.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "sepsis": 2000.0,
+      "aplastic_anemia": 500.0
+    },
+    "therapeutic_window_low_pg_ml": 100.0,
+    "therapeutic_window_high_pg_ml": 10000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 18.8,
+    "source": "Clinical reference",
+    "pmid": ["21613458"]
+  },
+  "CSF3": {
+    "healthy_plasma_median_pg_ml": 20.0,
+    "healthy_plasma_p5_pg_ml": 5.0,
+    "healthy_plasma_p95_pg_ml": 80.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "sepsis": 2000.0,
+      "neutropenia": 500.0
+    },
+    "therapeutic_window_low_pg_ml": 100.0,
+    "therapeutic_window_high_pg_ml": 10000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 18.8,
+    "source": "Clinical reference",
+    "pmid": ["21613458"]
+  },
+  "CSF2": {
+    "healthy_plasma_median_pg_ml": 5.0,
+    "healthy_plasma_p5_pg_ml": 1.0,
+    "healthy_plasma_p95_pg_ml": 20.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "sepsis": 500.0,
+      "autoimmune": 50.0
+    },
+    "therapeutic_window_low_pg_ml": 50.0,
+    "therapeutic_window_high_pg_ml": 5000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 16.3,
+    "source": "Clinical reference + Olink",
+    "pmid": ["21613458"]
+  },
+  "PDGFA": {
+    "healthy_plasma_median_pg_ml": 500.0,
+    "healthy_plasma_p5_pg_ml": 100.0,
+    "healthy_plasma_p95_pg_ml": 2000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "cancer": 3000.0,
+      "fibrosis": 5000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 23.9,
+    "source": "Olink + HPA",
+    "pmid": ["17898715"]
+  },
+  "FGF7": {
+    "healthy_plasma_median_pg_ml": 20.0,
+    "healthy_plasma_p5_pg_ml": 5.0,
+    "healthy_plasma_p95_pg_ml": 80.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "cancer": 200.0,
+      "psoriasis": 150.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 23.1,
+    "source": "Olink + literature",
+    "pmid": ["17898715"]
+  },
+  "KITLG": {
+    "healthy_plasma_median_pg_ml": 3000.0,
+    "healthy_plasma_p5_pg_ml": 1000.0,
+    "healthy_plasma_p95_pg_ml": 8000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "mastocytosis": 20000.0,
+      "AML": 10000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 18.5,
+    "source": "Clinical hematology + Olink",
+    "pmid": ["21613458"]
+  },
+  "VEGFB": {
+    "healthy_plasma_median_pg_ml": 30.0,
+    "healthy_plasma_p5_pg_ml": 10.0,
+    "healthy_plasma_p95_pg_ml": 100.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "cancer": 150.0,
+      "heart_failure": 100.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 22.1,
+    "source": "Olink + literature",
+    "pmid": ["19127148"]
+  },
+  "VEGFC": {
+    "healthy_plasma_median_pg_ml": 2000.0,
+    "healthy_plasma_p5_pg_ml": 800.0,
+    "healthy_plasma_p95_pg_ml": 5000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "lymphedema": 10000.0,
+      "cancer": 5000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 46.9,
+    "source": "Olink",
+    "pmid": ["19127148"]
+  },
+  "ANGPT2": {
+    "healthy_plasma_median_pg_ml": 1500.0,
+    "healthy_plasma_p5_pg_ml": 500.0,
+    "healthy_plasma_p95_pg_ml": 5000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "sepsis": 20000.0,
+      "cancer": 8000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 57.7,
+    "source": "Olink + literature",
+    "pmid": ["19127148"]
+  },
+  "PLAT": {
+    "healthy_plasma_median_pg_ml": 5000.0,
+    "healthy_plasma_p5_pg_ml": 2000.0,
+    "healthy_plasma_p95_pg_ml": 15000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "thrombosis": 20000.0,
+      "cardiac_injury": 25000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 63.2,
+    "source": "Clinical hemostasis reference",
+    "pmid": ["24376126"]
+  },
+  "F3": {
+    "healthy_plasma_median_pg_ml": 200000.0,
+    "healthy_plasma_p5_pg_ml": 100000.0,
+    "healthy_plasma_p95_pg_ml": 500000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "DIC": 50000.0,
+      "sepsis": 800000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 33.0,
+    "source": "Clinical hemostasis reference",
+    "pmid": ["24376126"]
+  },
+  "LIF": {
+    "healthy_plasma_median_pg_ml": 5.0,
+    "healthy_plasma_p5_pg_ml": 1.0,
+    "healthy_plasma_p95_pg_ml": 20.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "rheumatoid_arthritis": 50.0,
+      "cancer": 30.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 22.0,
+    "source": "Olink + literature",
+    "pmid": ["26228753"]
+  },
+  "CNTF": {
+    "healthy_plasma_median_pg_ml": 10.0,
+    "healthy_plasma_p5_pg_ml": 2.0,
+    "healthy_plasma_p95_pg_ml": 50.0,
+    "healthy_csf_pg_ml": 5.0,
+    "disease_concentrations": {
+      "ALS": 50.0,
+      "multiple_sclerosis": 30.0
+    },
+    "therapeutic_window_low_pg_ml": 50.0,
+    "therapeutic_window_high_pg_ml": 5000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 22.7,
+    "source": "CNS literature",
+    "pmid": ["23540597"]
+  },
+  "PROS1": {
+    "healthy_plasma_median_pg_ml": 25000000.0,
+    "healthy_plasma_p5_pg_ml": 15000000.0,
+    "healthy_plasma_p95_pg_ml": 40000000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "protein_S_deficiency": 10000000.0,
+      "thrombosis": 12000000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 75.1,
+    "source": "Clinical coagulation reference",
+    "pmid": ["24376126"]
+  },
+  "VWF": {
+    "healthy_plasma_median_pg_ml": 10000000.0,
+    "healthy_plasma_p5_pg_ml": 5000000.0,
+    "healthy_plasma_p95_pg_ml": 25000000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "von_willebrand_disease": 2000000.0,
+      "thrombotic_microangiopathy": 30000000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 309.0,
+    "source": "Clinical coagulation reference",
+    "pmid": ["24376126"]
+  },
+  "APOA1": {
+    "healthy_plasma_median_pg_ml": 1200000000.0,
+    "healthy_plasma_p5_pg_ml": 900000000.0,
+    "healthy_plasma_p95_pg_ml": 1700000000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "atherosclerosis": 900000000.0,
+      "type2_diabetes": 1000000000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 28.1,
+    "source": "Clinical lipid reference",
+    "pmid": ["24376126"]
+  },
+  "CLU": {
+    "healthy_plasma_median_pg_ml": 50000000.0,
+    "healthy_plasma_p5_pg_ml": 30000000.0,
+    "healthy_plasma_p95_pg_ml": 100000000.0,
+    "healthy_csf_pg_ml": 2000000.0,
+    "disease_concentrations": {
+      "alzheimer": 3000000.0,
+      "cancer": 80000000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 52.5,
+    "source": "Olink + CSF proteomics",
+    "pmid": ["26276051"]
+  },
+  "S100A8": {
+    "healthy_plasma_median_pg_ml": 1000.0,
+    "healthy_plasma_p5_pg_ml": 200.0,
+    "healthy_plasma_p95_pg_ml": 5000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "sepsis": 100000.0,
+      "rheumatoid_arthritis": 20000.0,
+      "covid19_severe": 50000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 11.2,
+    "source": "Clinical literature",
+    "pmid": ["32814053"]
+  },
+  "LGALS3": {
+    "healthy_plasma_median_pg_ml": 8000.0,
+    "healthy_plasma_p5_pg_ml": 3000.0,
+    "healthy_plasma_p95_pg_ml": 20000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "heart_failure": 50000.0,
+      "cancer": 30000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 26.2,
+    "source": "Cardiac biomarker literature",
+    "pmid": ["26276051"]
+  },
+  "THBS1": {
+    "healthy_plasma_median_pg_ml": 200000.0,
+    "healthy_plasma_p5_pg_ml": 100000.0,
+    "healthy_plasma_p95_pg_ml": 500000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "cancer": 500000.0,
+      "diabetic_complications": 400000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 129.4,
+    "source": "HPA + Olink",
+    "pmid": ["17898715"]
+  },
+  "CTGF": {
+    "healthy_plasma_median_pg_ml": 300.0,
+    "healthy_plasma_p5_pg_ml": 100.0,
+    "healthy_plasma_p95_pg_ml": 1000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "fibrosis": 5000.0,
+      "heart_failure": 3000.0,
+      "diabetes": 2000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 38.1,
+    "source": "Olink + fibrosis literature",
+    "pmid": ["26276051"]
+  },
+  "CCN2": {
+    "healthy_plasma_median_pg_ml": 300.0,
+    "healthy_plasma_p5_pg_ml": 100.0,
+    "healthy_plasma_p95_pg_ml": 1000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "fibrosis": 5000.0,
+      "heart_failure": 3000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 38.1,
+    "source": "Olink + fibrosis literature",
+    "pmid": ["26276051"]
+  },
+  "TGFB3": {
+    "healthy_plasma_median_pg_ml": 800.0,
+    "healthy_plasma_p5_pg_ml": 300.0,
+    "healthy_plasma_p95_pg_ml": 2000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "fibrosis": 5000.0,
+      "cancer": 3000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 47.0,
+    "source": "Olink + literature",
+    "pmid": ["24376126"]
+  },
+  "HGFL": {
+    "healthy_plasma_median_pg_ml": 500.0,
+    "healthy_plasma_p5_pg_ml": 100.0,
+    "healthy_plasma_p95_pg_ml": 2000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "liver_disease": 5000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 78.6,
+    "source": "Olink",
+    "pmid": ["17898715"]
+  },
+  "EFNA1": {
+    "healthy_plasma_median_pg_ml": 1000.0,
+    "healthy_plasma_p5_pg_ml": 300.0,
+    "healthy_plasma_p95_pg_ml": 3000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "cancer": 5000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 20.5,
+    "source": "Olink",
+    "pmid": ["19127148"]
+  },
+  "BMP2": {
+    "healthy_plasma_median_pg_ml": 500.0,
+    "healthy_plasma_p5_pg_ml": 100.0,
+    "healthy_plasma_p95_pg_ml": 2000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "heterotopic_ossification": 5000.0,
+      "bone_disease": 2000.0
+    },
+    "therapeutic_window_low_pg_ml": 100.0,
+    "therapeutic_window_high_pg_ml": 100000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 26.3,
+    "source": "Olink + bone biology literature",
+    "pmid": ["17898715"]
+  },
+  "BMP7": {
+    "healthy_plasma_median_pg_ml": 200.0,
+    "healthy_plasma_p5_pg_ml": 50.0,
+    "healthy_plasma_p95_pg_ml": 800.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "renal_disease": 1000.0,
+      "fibrosis": 100.0
+    },
+    "therapeutic_window_low_pg_ml": 100.0,
+    "therapeutic_window_high_pg_ml": 50000.0,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 49.6,
+    "source": "Olink + nephrology literature",
+    "pmid": ["17898715"]
+  },
+  "WNT5A": {
+    "healthy_plasma_median_pg_ml": 100.0,
+    "healthy_plasma_p5_pg_ml": 20.0,
+    "healthy_plasma_p95_pg_ml": 500.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "cancer": 1000.0,
+      "melanoma": 2000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 39.4,
+    "source": "Olink + cancer literature",
+    "pmid": ["26228753"]
+  },
+  "CALR": {
+    "healthy_plasma_median_pg_ml": 5000.0,
+    "healthy_plasma_p5_pg_ml": 2000.0,
+    "healthy_plasma_p95_pg_ml": 15000.0,
+    "healthy_csf_pg_ml": null,
+    "disease_concentrations": {
+      "cancer": 30000.0,
+      "autoimmune": 20000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 46.0,
+    "source": "Olink + immunology literature",
+    "pmid": ["26228753"]
+  },
+  "HMGB1": {
+    "healthy_plasma_median_pg_ml": 1000.0,
+    "healthy_plasma_p5_pg_ml": 200.0,
+    "healthy_plasma_p95_pg_ml": 5000.0,
+    "healthy_csf_pg_ml": 500.0,
+    "disease_concentrations": {
+      "sepsis": 50000.0,
+      "rheumatoid_arthritis": 10000.0,
+      "traumatic_brain_injury": 20000.0
+    },
+    "therapeutic_window_low_pg_ml": null,
+    "therapeutic_window_high_pg_ml": null,
+    "toxic_threshold_pg_ml": null,
+    "molecular_weight_kda": 24.9,
+    "source": "Olink + DAMP literature",
+    "pmid": ["32814053"]
+  }
+}
