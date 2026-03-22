@@ -27,6 +27,8 @@ from app.services import (
 from app.services.differential import run_differential_analysis
 from app.services.concentration_analysis import analyze_concentrations
 from app.services.pk_analysis import analyze_pk_properties
+from app.services.reference_library import compare_to_references
+from app.services.llm_interpretation import build_analysis_context, generate_interpretation
 from app.workers.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
@@ -160,6 +162,24 @@ async def _execute_pipeline(job_id: str) -> None:
     # Phase 3: Concentration analysis (requires UniProt data)
     if "concentrations" in modules and protein_concentrations:
         await _run_concentrations(job_id, proteins, protein_concentrations, uniprot_data)
+
+    # Phase 4: Reference library comparison (fast, depends only on gene names)
+    reference_library_data: dict | None = None
+    if "reference_library" in modules:
+        reference_library_data = await _run_reference_library(job_id, proteins, uniprot_data)
+
+    # Phase 5: LLM interpretation (runs last — aggregates all results)
+    if "llm_interpretation" in modules:
+        # Fetch results from previous modules to build context
+        therapeutic_data = await _load_module_data(job_id, "therapeutic")
+        concentration_data = await _load_module_data(job_id, "concentrations") if protein_concentrations else None
+        await _run_llm_interpretation(
+            job_id, proteins, uniprot_data,
+            therapeutic_data=therapeutic_data,
+            pk_data=pk_data,
+            concentration_data=concentration_data,
+            reference_library_data=reference_library_data,
+        )
 
     await _update_job(job_id, status="completed")
     logger.info("Pipeline completed for job %s", job_id)
@@ -344,6 +364,66 @@ async def _run_concentrations(
         await _set_module_progress(job_id, "concentrations", "completed", 100)
     except Exception as e:
         await _set_module_progress(job_id, "concentrations", "failed", 0, str(e))
+
+
+async def _load_module_data(job_id: str, module: str) -> dict | None:
+    """Load previously-saved module result from MinIO, return None if not found."""
+    try:
+        key = f"jobs/{job_id}/{module}.json"
+        return await minio_client.download_json(key)
+    except Exception:
+        return None
+
+
+async def _run_reference_library(
+    job_id: str,
+    proteins: list[str],
+    uniprot_data: dict,
+) -> dict | None:
+    await _set_module_progress(job_id, "reference_library", "running", 0)
+    try:
+        data = compare_to_references(proteins, uniprot_data)
+        top = data.get("top_match") or {}
+        await _save_result(job_id, "reference_library", data, {
+            "query_size": data.get("query_size", 0),
+            "top_match_name": top.get("reference_name", ""),
+            "top_similarity_pct": top.get("similarity_pct", 0),
+        })
+        await _set_module_progress(job_id, "reference_library", "completed", 100)
+        return data
+    except Exception as e:
+        await _set_module_progress(job_id, "reference_library", "failed", 0, str(e))
+        return None
+
+
+async def _run_llm_interpretation(
+    job_id: str,
+    proteins: list[str],
+    uniprot_data: dict,
+    therapeutic_data: dict | None = None,
+    pk_data: dict | None = None,
+    concentration_data: dict | None = None,
+    reference_library_data: dict | None = None,
+) -> None:
+    await _set_module_progress(job_id, "llm_interpretation", "running", 0)
+    try:
+        context = build_analysis_context(
+            proteins=proteins,
+            uniprot_data=uniprot_data,
+            therapeutic_data=therapeutic_data,
+            pk_data=pk_data,
+            concentration_data=concentration_data,
+            reference_library_data=reference_library_data,
+        )
+        data = generate_interpretation(context, settings)
+        await _save_result(job_id, "llm_interpretation", data, {
+            "enabled": data.get("enabled", False),
+            "model": data.get("model", ""),
+            "has_error": bool(data.get("error")),
+        })
+        await _set_module_progress(job_id, "llm_interpretation", "completed", 100)
+    except Exception as e:
+        await _set_module_progress(job_id, "llm_interpretation", "failed", 0, str(e))
 
 
 # ── Comparison pipeline ────────────────────────────────────────────────────────

@@ -9,11 +9,13 @@ from pydantic import BaseModel, Field
 ModuleName = Literal[
     "uniprot", "string", "gprofiler", "hpa", "signalp", "pharos", "sasp", "comparison",
     "therapeutic", "receptor_ligand", "safety", "disease_context",
+    "pk", "concentrations", "reference_library", "llm_interpretation",
 ]
 
 ALL_MODULES: list[str] = [
     "uniprot", "string", "gprofiler", "hpa", "signalp", "sasp",
     "therapeutic", "receptor_ligand", "safety", "disease_context",
+    "pk", "reference_library", "llm_interpretation",
 ]
 
 # Modules run on each set in a comparison job (no STRING — expensive, not used in diff)

@@ -14,12 +14,14 @@ import { SummaryPanel } from "@/components/results/SummaryPanel";
 import { TherapeuticTab } from "@/components/results/TherapeuticTab";
 import ConcentrationsTab from "@/components/results/ConcentrationsTab";
 import PharmacokineticTab from "@/components/results/PharmacokineticTab";
+import InterpretationTab from "@/components/results/InterpretationTab";
+import ReferenceLibraryTab from "@/components/results/ReferenceLibraryTab";
 import type { Result } from "@/types";
 
 // Phase 2 modules are rendered together in a single composite tab
 const PHASE2_MODULES = new Set(["therapeutic", "receptor_ligand", "safety", "disease_context"]);
-// Phase 3 modules have their own dedicated tabs
-const PHASE3_MODULES = new Set(["pk", "concentrations"]);
+// Phase 3+ modules have their own dedicated tabs
+const PHASE3_MODULES = new Set(["pk", "concentrations", "reference_library", "llm_interpretation"]);
 
 const PANEL_MAP: Record<string, ComponentType<{ result: Result }>> = {
   uniprot:   UniprotPanel,
@@ -31,17 +33,19 @@ const PANEL_MAP: Record<string, ComponentType<{ result: Result }>> = {
 };
 
 const TAB_LABELS: Record<string, string> = {
-  summary:          "Summary",
-  uniprot:          "UniProt",
-  string:           "STRING",
-  gprofiler:        "Enrichment",
-  sasp:             "SASP",
-  signalp:          "SignalP",
-  hpa:              "HPA",
-  comparison:       "Comparison",
-  therapeutic_view: "Therapeutic",
-  pk:               "Pharmacokinetics",
-  concentrations:   "Concentrations",
+  summary:           "Summary",
+  uniprot:           "UniProt",
+  string:            "STRING",
+  gprofiler:         "Enrichment",
+  sasp:              "SASP",
+  signalp:           "SignalP",
+  hpa:               "HPA",
+  comparison:        "Comparison",
+  therapeutic_view:  "Therapeutic",
+  pk:                "Pharmacokinetics",
+  concentrations:    "Concentrations",
+  reference_library: "Reference Library",
+  llm_interpretation:"AI Interpretation",
 };
 
 export default function Results() {
@@ -75,6 +79,8 @@ export default function Results() {
   const hasPhase2 = results.some((r: Result) => PHASE2_MODULES.has(r.module_name));
   const hasPK = results.some((r: Result) => r.module_name === "pk");
   const hasConcentrations = results.some((r: Result) => r.module_name === "concentrations");
+  const hasReferenceLibrary = results.some((r: Result) => r.module_name === "reference_library");
+  const hasLLM = results.some((r: Result) => r.module_name === "llm_interpretation");
   const phase1Results = results.filter(
     (r: Result) => !PHASE2_MODULES.has(r.module_name) && !PHASE3_MODULES.has(r.module_name)
   );
@@ -84,6 +90,8 @@ export default function Results() {
     ...(hasPhase2 ? ["therapeutic_view"] : []),
     ...(hasPK ? ["pk"] : []),
     ...(hasConcentrations ? ["concentrations"] : []),
+    ...(hasReferenceLibrary ? ["reference_library"] : []),
+    ...(hasLLM ? ["llm_interpretation"] : []),
   ];
 
   const activeResult = results.find((r: Result) => r.module_name === activeTab);
@@ -101,12 +109,15 @@ export default function Results() {
           <h1 className="text-xl font-bold text-gray-900">Analysis Results</h1>
           <p className="text-xs text-gray-400 font-mono">{jobId}</p>
         </div>
-        <button
-          onClick={() => setShowMethodsModal(true)}
-          className="shrink-0 px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          Export Methods
-        </button>
+        <div className="flex gap-2">
+          <PDFDownloadButton jobId={jobId!} />
+          <button
+            onClick={() => setShowMethodsModal(true)}
+            className="shrink-0 px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            Export Methods
+          </button>
+        </div>
       </div>
 
       {/* Tab bar */}
@@ -141,6 +152,10 @@ export default function Results() {
         <PKTabLoader jobId={jobId!} />
       ) : activeTab === "concentrations" ? (
         <ConcentrationsTabLoader jobId={jobId!} />
+      ) : activeTab === "reference_library" ? (
+        <ReferenceLibraryTabLoader jobId={jobId!} />
+      ) : activeTab === "llm_interpretation" ? (
+        <LLMTabLoader jobId={jobId!} />
       ) : Panel && activeResult ? (
         <Panel result={activeResult} />
       ) : (
@@ -180,6 +195,59 @@ function ConcentrationsTabLoader({ jobId }: { jobId: string }) {
   if (isLoading) return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
   if (!data) return <div className="text-center py-8 text-gray-400 text-sm">No concentration data available.</div>;
   return <ConcentrationsTab data={data as Parameters<typeof ConcentrationsTab>[0]["data"]} />;
+}
+
+function ReferenceLibraryTabLoader({ jobId }: { jobId: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["module_data", jobId, "reference_library"],
+    queryFn: () => resultsApi.getModuleData(jobId, "reference_library"),
+  });
+  if (isLoading) return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
+  if (!data) return <div className="text-center py-8 text-gray-400 text-sm">No reference library data available.</div>;
+  return <ReferenceLibraryTab data={data as Parameters<typeof ReferenceLibraryTab>[0]["data"]} />;
+}
+
+function LLMTabLoader({ jobId }: { jobId: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["module_data", jobId, "llm_interpretation"],
+    queryFn: () => resultsApi.getModuleData(jobId, "llm_interpretation"),
+  });
+  if (isLoading) return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
+  if (!data) return <div className="text-center py-8 text-gray-400 text-sm">No AI interpretation available.</div>;
+  return <InterpretationTab data={data as Parameters<typeof InterpretationTab>[0]["data"]} />;
+}
+
+function PDFDownloadButton({ jobId }: { jobId: string }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleDownload = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/v1/results/job/${jobId}/report.pdf`);
+      if (!response.ok) throw new Error("PDF generation failed");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `secretome_report_${jobId.slice(0, 8)}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      alert("PDF download failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleDownload}
+      disabled={loading}
+      className="shrink-0 px-3 py-1.5 text-sm font-medium rounded-md border border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-40 transition-colors"
+    >
+      {loading ? "Generating PDF…" : "↓ Download PDF"}
+    </button>
+  );
 }
 
 function DownloadButton({ jobId, moduleName }: { jobId: string; moduleName: string }) {

@@ -1,7 +1,7 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,6 +11,7 @@ from app.models.result import Result
 from app.schemas.result import ResultDownloadURL, ResultRead
 from app.services import minio_client
 from app.services.methods_report import generate_report
+from app.services.report_generator import generate_pdf_report
 
 router = APIRouter()
 
@@ -78,6 +79,47 @@ async def get_methods_report(
         module_data=module_data,
     )
     return JSONResponse(content=report)
+
+
+@router.get("/job/{job_id}/report.pdf")
+async def download_pdf_report(
+    job_id: uuid.UUID, db: AsyncSession = Depends(get_db)
+) -> Response:
+    """Generate and download a full PDF report for a job."""
+    job_res = await db.execute(select(Job).where(Job.id == job_id))
+    job = job_res.scalar_one_or_none()
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    res = await db.execute(select(Result).where(Result.job_id == job_id))
+    results = list(res.scalars().all())
+
+    module_data: dict = {}
+    for result in results:
+        if result.minio_key:
+            try:
+                data = await minio_client.download_json(result.minio_key)
+                module_data[result.module_name] = data
+            except Exception:
+                module_data[result.module_name] = {}
+
+    try:
+        pdf_bytes = generate_pdf_report(
+            job_id=str(job_id),
+            proteins=job.proteins or [],
+            module_data=module_data,
+            job_label=job.label,
+        )
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="secretome_report_{str(job_id)[:8]}.pdf"'
+        },
+    )
 
 
 @router.get("/{result_id}", response_model=ResultRead)

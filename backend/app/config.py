@@ -53,6 +53,11 @@ class Settings(BaseSettings):
     opentargets_api_url: str = "https://api.platform.opentargets.org/api/v4/graphql"
     disgenet_api_url: str = "https://www.disgenet.org/api"
 
+    # LLM / Claude API
+    anthropic_api_key: str = ""
+    llm_model: str = "claude-opus-4-5"
+    llm_enabled: bool = False
+
 
 @lru_cache
 def get_settings() -> Settings:
