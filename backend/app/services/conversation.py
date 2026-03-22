@@ -5,6 +5,7 @@ specific secretome analysis results using Claude.
 """
 from __future__ import annotations
 
+import json
 import logging
 from typing import Any
 
@@ -40,6 +41,76 @@ SECRETOME ANALYSIS DATA:
 {context}
 """
 
+
+# ── Safe coercion helpers ──────────────────────────────────────────────────────
+
+def safe_list(value: Any, default: list | None = None) -> list:
+    """Safely convert any value to a list.
+
+    Handles None, dicts (keyed by numeric strings or arbitrary keys),
+    JSON strings, and anything else iterable.
+    """
+    if default is None:
+        default = []
+    if value is None:
+        return default
+    if isinstance(value, list):
+        return value
+    if isinstance(value, dict):
+        # Numeric-keyed dict → ordered list of values
+        try:
+            max_key = max(int(k) for k in value.keys() if str(k).isdigit())
+            return [
+                value.get(str(i), value.get(i))
+                for i in range(max_key + 1)
+                if value.get(str(i)) is not None or value.get(i) is not None
+            ]
+        except (ValueError, AttributeError):
+            return list(value.values())
+    if isinstance(value, str):
+        try:
+            parsed = json.loads(value)
+            return safe_list(parsed, default)
+        except Exception:
+            return [value] if value else default
+    try:
+        return list(value)
+    except Exception:
+        return default
+
+
+def safe_dict(value: Any, default: dict | None = None) -> dict:
+    """Safely return a dict, coercing None / non-dicts to default."""
+    if default is None:
+        default = {}
+    if isinstance(value, dict):
+        return value
+    return default
+
+
+def safe_str(value: Any, default: str = "?") -> str:
+    if value is None:
+        return default
+    if isinstance(value, (list, dict)):
+        return str(value)[:100]
+    return str(value)
+
+
+def safe_float(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def safe_int(value: Any, default: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+# ── Context builder ────────────────────────────────────────────────────────────
 
 def build_context(all_results: dict[str, Any]) -> str:
     """
@@ -102,31 +173,30 @@ def build_context(all_results: dict[str, Any]) -> str:
     sasp = all_results.get("sasp", {})
     if sasp:
         lines.append("\n=== SASP ASSESSMENT ===")
-        sasp_proteins = sasp.get("sasp_proteins", [])
-        sasp_count = sasp.get("sasp_count", len(sasp_proteins))
-        total = sasp.get("total", 1)
-        fraction = sasp_count / total if total else 0
+        sasp_proteins = safe_list(sasp.get("sasp_proteins"))
+        sasp_count = safe_int(sasp.get("sasp_count", len(sasp_proteins)))
+        total = safe_int(sasp.get("total", 1)) or 1
+        fraction = sasp_count / total
         lines.append(
             f"SASP proteins ({sasp_count}/{total}, {fraction:.1%}): "
-            f"{', '.join(sasp_proteins[:30])}"
+            f"{', '.join(str(p) for p in sasp_proteins[:30])}"
         )
 
     # ── STRING network ─────────────────────────────────────────────────────
     string_data = all_results.get("string", {})
     if string_data:
         lines.append("\n=== PROTEIN INTERACTION NETWORK ===")
-        interactions = string_data.get("interactions", [])
-        n_edges = len(interactions)
-        nodes = string_data.get("proteins", [])
-        n_nodes = len(nodes) if nodes else 0
-        lines.append(f"Nodes: {n_nodes} | Edges: {n_edges}")
-        # Top hubs by degree
+        interactions = safe_list(string_data.get("interactions"))
+        nodes = safe_list(string_data.get("proteins"))
+        lines.append(f"Nodes: {len(nodes)} | Edges: {len(interactions)}")
         degree: dict[str, int] = {}
         for edge in interactions:
+            if not isinstance(edge, dict):
+                continue
             for k in ("protein1", "protein2", "gene1", "gene2"):
                 v = edge.get(k)
                 if v:
-                    degree[v] = degree.get(v, 0) + 1
+                    degree[str(v)] = degree.get(str(v), 0) + 1
         hubs = sorted(degree.items(), key=lambda x: x[1], reverse=True)[:15]
         if hubs:
             lines.append(
@@ -137,9 +207,11 @@ def build_context(all_results: dict[str, Any]) -> str:
     gprofiler = all_results.get("gprofiler", {})
     if gprofiler:
         lines.append("\n=== ENRICHED PATHWAYS (top 40) ===")
-        results_list = gprofiler.get("results", [])
+        results_list = safe_list(gprofiler.get("results"))
         for t in results_list[:40]:
-            genes = t.get("intersections") or t.get("genes") or []
+            if not isinstance(t, dict):
+                continue
+            genes = safe_list(t.get("intersections") or t.get("genes"))
             genes_str = ", ".join(str(g) for g in genes[:8])
             pval = t.get("p_value") or t.get("adjusted_p_value") or 1
             lines.append(
@@ -155,12 +227,14 @@ def build_context(all_results: dict[str, Any]) -> str:
             f"Top: {therapeutic.get('top_indication','?')} | "
             f"Confidence: {therapeutic.get('overall_confidence','?')}"
         )
-        for ind in therapeutic.get("indications", [])[:12]:
-            sup = ", ".join((ind.get("supporting_proteins") or [])[:6])
-            lim = ", ".join((ind.get("limiting_factors") or [])[:3])
+        for ind in safe_list(therapeutic.get("indications"))[:12]:
+            if not isinstance(ind, dict):
+                continue
+            sup = ", ".join(str(p) for p in safe_list(ind.get("supporting_proteins"))[:6])
+            lim = ", ".join(str(p) for p in safe_list(ind.get("limiting_factors"))[:3])
             lines.append(
                 f"  {ind.get('label', ind.get('name','?'))}: "
-                f"score={ind.get('score',0):.2f} ({ind.get('confidence','?')}) | "
+                f"score={safe_float(ind.get('score')):.2f} ({ind.get('confidence','?')}) | "
                 f"hits={ind.get('positive_hit_count',0)} | "
                 f"supporting: {sup} | limiting: {lim}"
             )
@@ -171,11 +245,13 @@ def build_context(all_results: dict[str, Any]) -> str:
         lines.append("\n=== SAFETY PROFILE ===")
         lines.append(
             f"Risk: {safety.get('risk_level','?')} | "
-            f"Score: {safety.get('overall_safety_score',0):.0f}/100 | "
+            f"Score: {safe_float(safety.get('overall_safety_score')):.0f}/100 | "
             f"Flagged: {safety.get('total_flagged',0)}"
         )
-        for dim in safety.get("dimensions", [])[:8]:
-            flagged = ", ".join((dim.get("flagged_proteins") or [])[:5])
+        for dim in safe_list(safety.get("dimensions"))[:8]:
+            if not isinstance(dim, dict):
+                continue
+            flagged = ", ".join(str(p) for p in safe_list(dim.get("flagged_proteins"))[:5])
             lines.append(
                 f"  {dim.get('name','?')}: {dim.get('risk_level','?')} | {flagged}"
             )
@@ -184,13 +260,15 @@ def build_context(all_results: dict[str, Any]) -> str:
     pk = all_results.get("pk", {})
     if pk:
         lines.append("\n=== PHARMACOKINETIC PROPERTIES ===")
-        pk_summary = pk.get("pk_summary", {})
+        pk_summary = safe_dict(pk.get("pk_summary"))
         lines.append(
             f"BBB-crossing: {pk_summary.get('bbb_crossing_count',0)} | "
             f"Short t½: {pk_summary.get('short_half_life_count',0)} | "
-            f"Mean MW: {pk_summary.get('mean_molecular_weight_kda',0):.1f} kDa"
+            f"Mean MW: {safe_float(pk_summary.get('mean_molecular_weight_kda')):.1f} kDa"
         )
-        for p in pk.get("proteins", [])[:60]:
+        for p in safe_list(pk.get("proteins"))[:60]:
+            if not isinstance(p, dict):
+                continue
             gene = p.get("gene_name") or p.get("input_id", "?")
             mw = p.get("molecular_weight_kda", "?")
             hl = p.get("plasma_half_life_hours", "?")
@@ -205,16 +283,21 @@ def build_context(all_results: dict[str, Any]) -> str:
     concentrations = all_results.get("concentrations", {})
     if concentrations:
         lines.append("\n=== CONCENTRATION ANALYSIS ===")
-        conc_summary = concentrations.get("summary", {})
+        conc_summary = safe_dict(concentrations.get("summary"))
+        caution_proteins = ", ".join(
+            str(x) for x in safe_list(conc_summary.get("caution_proteins"))[:6]
+        )
         lines.append(
             f"Quantified: {concentrations.get('total_quantified',0)} | "
             f"Physiological: {conc_summary.get('physiological_count',0)} | "
             f"Supra: {conc_summary.get('supra_physiological_count',0)} | "
-            f"Caution: {', '.join(conc_summary.get('caution_proteins',[])[:6])}"
+            f"Caution: {caution_proteins}"
         )
-        for p in concentrations.get("concentration_profiles", [])[:40]:
+        for p in safe_list(concentrations.get("concentration_profiles"))[:40]:
+            if not isinstance(p, dict):
+                continue
             fold = p.get("fold_over_healthy")
-            fold_str = f"{fold:.1f}x" if fold is not None else "?"
+            fold_str = f"{fold:.1f}x" if isinstance(fold, (int, float)) else "?"
             lines.append(
                 f"  {p.get('gene_name','?')}: "
                 f"{p.get('user_concentration_pg_ml','?')} pg/mL | "
@@ -227,72 +310,83 @@ def build_context(all_results: dict[str, Any]) -> str:
     if reference:
         lines.append("\n=== REFERENCE SECRETOME COMPARISON ===")
         lines.append(reference.get("summary_text", ""))
-        for comp in reference.get("comparisons", [])[:6]:
+        for comp in safe_list(reference.get("comparisons"))[:6]:
+            if not isinstance(comp, dict):
+                continue
             lines.append(
                 f"  {comp.get('reference_name','?')}: "
-                f"similarity={comp.get('similarity_pct',0):.1f}% | "
-                f"Jaccard={comp.get('jaccard',0):.3f} | "
+                f"similarity={safe_float(comp.get('similarity_pct')):.1f}% | "
+                f"Jaccard={safe_float(comp.get('jaccard')):.3f} | "
                 f"shared={comp.get('shared_count',0)} | "
-                f"F1={comp.get('f1',0):.3f}"
+                f"F1={safe_float(comp.get('f1')):.3f}"
             )
-        top = reference.get("top_match") or {}
-        shared = top.get("shared_proteins", [])
+        top = safe_dict(reference.get("top_match"))
+        shared = safe_list(top.get("shared_proteins"))
         if shared:
-            lines.append(f"  Shared with top: {', '.join(shared[:20])}")
+            lines.append(f"  Shared with top: {', '.join(str(p) for p in shared[:20])}")
 
     return "\n".join(lines)
 
+
+# ── Suggestions ────────────────────────────────────────────────────────────────
 
 def generate_suggestions(all_results: dict[str, Any]) -> list[str]:
     """Generate context-specific suggested questions from analysis findings."""
     suggestions: list[str] = []
 
     therapeutic = all_results.get("therapeutic", {})
+    raw_indications = safe_list(therapeutic.get("indications"))
+    # Filter to dicts only before sorting
+    dict_indications = [x for x in raw_indications if isinstance(x, dict)]
     indications = sorted(
-        therapeutic.get("indications", []),
-        key=lambda x: x.get("score", 0),
+        dict_indications,
+        key=lambda x: safe_float(x.get("score")),
         reverse=True,
     )
     top_ind = indications[0] if indications else None
     second_ind = indications[1] if len(indications) > 1 else None
 
     safety = all_results.get("safety", {})
-    risk_level = safety.get("risk_level", "Low")
+    risk_level = safe_str(safety.get("risk_level"), "Low")
     flagged: list[str] = []
-    for dim in safety.get("dimensions", []):
-        flagged.extend(dim.get("flagged_proteins", []))
+    for dim in safe_list(safety.get("dimensions")):
+        if isinstance(dim, dict):
+            flagged.extend(str(p) for p in safe_list(dim.get("flagged_proteins")))
     flagged = list(dict.fromkeys(flagged))[:5]
 
     sasp = all_results.get("sasp", {})
-    sasp_proteins = sasp.get("sasp_proteins", [])
-    sasp_count = sasp.get("sasp_count", len(sasp_proteins))
-    total = sasp.get("total", 1) or 1
+    sasp_proteins = safe_list(sasp.get("sasp_proteins"))
+    sasp_proteins = [str(p) for p in sasp_proteins]
+    sasp_count = safe_int(sasp.get("sasp_count", len(sasp_proteins)))
+    total = safe_int(sasp.get("total", 1)) or 1
     sasp_fraction = sasp_count / total
 
     pk = all_results.get("pk", {})
     bbb_list = [
-        p.get("gene_name", "?")
-        for p in pk.get("proteins", [])
-        if p.get("bbb_penetration_class", "").startswith("Established")
+        str(p.get("gene_name", "?"))
+        for p in safe_list(pk.get("proteins"))
+        if isinstance(p, dict)
+        and safe_str(p.get("bbb_penetration_class", "")).startswith("Established")
     ]
     short_hl = [
-        p.get("gene_name", "?")
-        for p in pk.get("proteins", [])
-        if isinstance(p.get("plasma_half_life_hours"), (int, float))
+        str(p.get("gene_name", "?"))
+        for p in safe_list(pk.get("proteins"))
+        if isinstance(p, dict)
+        and isinstance(p.get("plasma_half_life_hours"), (int, float))
         and p["plasma_half_life_hours"] < 2
     ]
 
     reference = all_results.get("reference_library", {})
-    top_match = reference.get("top_match") or {}
+    top_match = safe_dict(reference.get("top_match"))
 
     concentrations = all_results.get("concentrations", {})
-    conc_summary = concentrations.get("summary", {})
-    most_elevated = conc_summary.get("most_elevated", "")
-    supra_count = conc_summary.get("supra_physiological_count", 0)
+    conc_summary = safe_dict(concentrations.get("summary"))
+    most_elevated = safe_str(conc_summary.get("most_elevated"), "")
+    supra_count = safe_int(conc_summary.get("supra_physiological_count"))
 
     if top_ind:
         label = top_ind.get("label") or top_ind.get("name", "")
-        score = top_ind.get("score", 0)
+        score = safe_float(top_ind.get("score"))
         suggestions.append(
             f"Why does this secretome score {score:.1f} for {label}? "
             f"Which proteins are the primary drivers?"
@@ -339,7 +433,7 @@ def generate_suggestions(all_results: dict[str, Any]) -> list[str]:
 
     if top_match.get("reference_name"):
         ref_name = top_match["reference_name"]
-        sim = top_match.get("similarity_pct", 0)
+        sim = safe_float(top_match.get("similarity_pct"))
         suggestions.append(
             f"This secretome is {sim:.0f}% similar to the {ref_name}. "
             f"What does the similarity (and the differences) mean therapeutically?"
@@ -370,6 +464,8 @@ def generate_suggestions(all_results: dict[str, Any]) -> list[str]:
             unique.append(s)
     return unique[:10]
 
+
+# ── Chat ───────────────────────────────────────────────────────────────────────
 
 async def chat_with_results(
     all_results: dict[str, Any],
