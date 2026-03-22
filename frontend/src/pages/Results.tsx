@@ -91,8 +91,9 @@ export default function Results() {
     ...(hasPhase2 ? ["therapeutic_view"] : []),
     ...(hasPK ? ["pk"] : []),
     ...(hasConcentrations ? ["concentrations"] : []),
-    ...(hasReferenceLibrary ? ["reference_library"] : []),
-    ...(hasLLM ? ["llm_interpretation"] : []),
+    // Always show these tabs — loaders handle missing-data state
+    "reference_library",
+    "llm_interpretation",
   ];
 
   const activeResult = results.find((r: Result) => r.module_name === activeTab);
@@ -205,9 +206,21 @@ function ReferenceLibraryTabLoader({ jobId }: { jobId: string }) {
   const { data, isLoading } = useQuery({
     queryKey: ["module_data", jobId, "reference_library"],
     queryFn: () => resultsApi.getModuleData(jobId, "reference_library"),
+    retry: false,
   });
   if (isLoading) return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
-  if (!data) return <div className="text-center py-8 text-gray-400 text-sm">No reference library data available.</div>;
+  if (!data) return (
+    <Card>
+      <CardContent className="py-10 text-center space-y-3">
+        <div className="text-4xl">📚</div>
+        <p className="text-base font-medium text-gray-700">Reference Library not available for this job</p>
+        <p className="text-sm text-gray-500 max-w-sm mx-auto">
+          This job was created before the Reference Library module was added.
+          Submit a new analysis to compare your secretome against 12 curated reference secretomes.
+        </p>
+      </CardContent>
+    </Card>
+  );
   return <ReferenceLibraryTab data={data as Parameters<typeof ReferenceLibraryTab>[0]["data"]} />;
 }
 
@@ -215,9 +228,21 @@ function LLMTabLoader({ jobId }: { jobId: string }) {
   const { data, isLoading } = useQuery({
     queryKey: ["module_data", jobId, "llm_interpretation"],
     queryFn: () => resultsApi.getModuleData(jobId, "llm_interpretation"),
+    retry: false,
   });
   if (isLoading) return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
-  if (!data) return <div className="text-center py-8 text-gray-400 text-sm">No AI interpretation available.</div>;
+  if (!data) return (
+    <Card>
+      <CardContent className="py-10 text-center space-y-3">
+        <div className="text-4xl">🤖</div>
+        <p className="text-base font-medium text-gray-700">AI Interpretation not available for this job</p>
+        <p className="text-sm text-gray-500 max-w-sm mx-auto">
+          This job was created before the AI Interpretation module was added.
+          Submit a new analysis to generate a Claude-powered scientific report.
+        </p>
+      </CardContent>
+    </Card>
+  );
   return <InterpretationTab data={data as Parameters<typeof InterpretationTab>[0]["data"]} />;
 }
 
