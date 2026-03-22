@@ -50,6 +50,8 @@ class Settings(BaseSettings):
     # External API settings
     http_timeout: int = 30
     http_max_retries: int = 3
+    opentargets_api_url: str = "https://api.platform.opentargets.org/api/v4/graphql"
+    disgenet_api_url: str = "https://www.disgenet.org/api"
 
 
 @lru_cache

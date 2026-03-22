@@ -8,7 +8,11 @@ export type ModuleName =
   | "signalp"
   | "pharos"
   | "sasp"
-  | "comparison";
+  | "comparison"
+  | "therapeutic"
+  | "receptor_ligand"
+  | "safety"
+  | "disease_context";
 
 export interface ModuleProgress {
   status: JobStatus;

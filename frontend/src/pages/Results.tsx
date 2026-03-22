@@ -11,7 +11,11 @@ import { SaspPanel } from "@/components/results/SaspPanel";
 import { SignalpPanel } from "@/components/results/SignalpPanel";
 import { HpaPanel } from "@/components/results/HpaPanel";
 import { SummaryPanel } from "@/components/results/SummaryPanel";
+import { TherapeuticTab } from "@/components/results/TherapeuticTab";
 import type { Result } from "@/types";
+
+// Phase 2 modules are rendered together in a single composite tab
+const PHASE2_MODULES = new Set(["therapeutic", "receptor_ligand", "safety", "disease_context"]);
 
 const PANEL_MAP: Record<string, React.ComponentType<{ result: Result }>> = {
   uniprot:   UniprotPanel,
@@ -23,14 +27,15 @@ const PANEL_MAP: Record<string, React.ComponentType<{ result: Result }>> = {
 };
 
 const TAB_LABELS: Record<string, string> = {
-  summary:   "Summary",
-  uniprot:   "UniProt",
-  string:    "STRING",
-  gprofiler: "Enrichment",
-  sasp:      "SASP",
-  signalp:   "SignalP",
-  hpa:       "HPA",
-  comparison: "Comparison",
+  summary:          "Summary",
+  uniprot:          "UniProt",
+  string:           "STRING",
+  gprofiler:        "Enrichment",
+  sasp:             "SASP",
+  signalp:          "SignalP",
+  hpa:              "HPA",
+  comparison:       "Comparison",
+  therapeutic_view: "Therapeutic",
 };
 
 export default function Results() {
@@ -59,9 +64,22 @@ export default function Results() {
     );
   }
 
-  const tabs = ["summary", ...results.map((r) => r.module_name)];
-  const activeResult = results.find((r) => r.module_name === activeTab);
+  // Separate Phase 2 modules into a single composite "Therapeutic" tab
+  const hasPhase2 = results.some((r: Result) => PHASE2_MODULES.has(r.module_name));
+  const phase1Results = results.filter((r: Result) => !PHASE2_MODULES.has(r.module_name));
+  const tabs = [
+    "summary",
+    ...phase1Results.map((r: Result) => r.module_name),
+    ...(hasPhase2 ? ["therapeutic_view"] : []),
+  ];
+
+  const activeResult = results.find((r: Result) => r.module_name === activeTab);
   const Panel = activeResult ? PANEL_MAP[activeResult.module_name] : null;
+
+  const therapeuticResult = results.find((r: Result) => r.module_name === "therapeutic");
+  const receptorLigandResult = results.find((r: Result) => r.module_name === "receptor_ligand");
+  const safetyResult = results.find((r: Result) => r.module_name === "safety");
+  const diseaseContextResult = results.find((r: Result) => r.module_name === "disease_context");
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 space-y-4">
@@ -88,6 +106,14 @@ export default function Results() {
       {/* Panel */}
       {activeTab === "summary" ? (
         <SummaryPanel results={results} />
+      ) : activeTab === "therapeutic_view" ? (
+        <TherapeuticTab
+          jobId={jobId!}
+          therapeuticResult={therapeuticResult}
+          receptorLigandResult={receptorLigandResult}
+          safetyResult={safetyResult}
+          diseaseContextResult={diseaseContextResult}
+        />
       ) : Panel && activeResult ? (
         <Panel result={activeResult} />
       ) : (

@@ -19,6 +19,10 @@ from app.services import (
     signalp as signalp_svc,
     string_db as string_svc,
     uniprot as uniprot_svc,
+    therapeutic as therapeutic_svc,
+    receptor_ligand as receptor_ligand_svc,
+    safety as safety_svc,
+    disease_context as disease_context_svc,
 )
 from app.workers.celery_app import celery_app
 
@@ -130,6 +134,20 @@ async def _execute_pipeline(job_id: str) -> None:
     if "comparison" in modules:
         await _run_comparison(job_id, proteins)
 
+    # Phase 2: Therapeutic Analysis Layer (runs after Phase 1 completes)
+    phase2 = []
+    if "therapeutic" in modules:
+        phase2.append(_run_therapeutic(job_id, proteins, uniprot_data))
+    if "receptor_ligand" in modules:
+        phase2.append(_run_receptor_ligand(job_id, proteins, uniprot_data))
+    if "safety" in modules:
+        phase2.append(_run_safety(job_id, proteins, uniprot_data))
+    if "disease_context" in modules:
+        phase2.append(_run_disease_context(job_id, proteins, uniprot_data))
+
+    if phase2:
+        await asyncio.gather(*phase2, return_exceptions=True)
+
     await _update_job(job_id, status="completed")
     logger.info("Pipeline completed for job %s", job_id)
 
@@ -201,3 +219,62 @@ async def _run_comparison(job_id: str, proteins: list[str]) -> None:
         await _set_module_progress(job_id, "comparison", "completed", 100)
     except Exception as e:
         await _set_module_progress(job_id, "comparison", "failed", 0, str(e))
+
+
+async def _run_therapeutic(job_id: str, proteins: list[str], uniprot_data: dict) -> None:
+    await _set_module_progress(job_id, "therapeutic", "running", 0)
+    try:
+        data = therapeutic_svc.score_therapeutic_indications(proteins, uniprot_data)
+        top = data.get("top_indication", "")
+        confidence = data.get("overall_confidence", "")
+        indications_scored = len(data.get("indications", []))
+        await _save_result(job_id, "therapeutic", data, {
+            "top_indication": top,
+            "confidence": confidence,
+            "indications_scored": indications_scored,
+        })
+        await _set_module_progress(job_id, "therapeutic", "completed", 100)
+    except Exception as e:
+        await _set_module_progress(job_id, "therapeutic", "failed", 0, str(e))
+
+
+async def _run_receptor_ligand(job_id: str, proteins: list[str], uniprot_data: dict) -> None:
+    await _set_module_progress(job_id, "receptor_ligand", "running", 0)
+    try:
+        data = receptor_ligand_svc.match_receptor_ligand(proteins, uniprot_data)
+        await _save_result(job_id, "receptor_ligand", data, {
+            "pairs_matched": data.get("total_pairs_matched", 0),
+            "target_cell_types": len(data.get("target_cell_types", [])),
+            "coverage_pct": data.get("coverage_percent", 0),
+        })
+        await _set_module_progress(job_id, "receptor_ligand", "completed", 100)
+    except Exception as e:
+        await _set_module_progress(job_id, "receptor_ligand", "failed", 0, str(e))
+
+
+async def _run_safety(job_id: str, proteins: list[str], uniprot_data: dict) -> None:
+    await _set_module_progress(job_id, "safety", "running", 0)
+    try:
+        data = safety_svc.profile_safety(proteins, uniprot_data)
+        await _save_result(job_id, "safety", data, {
+            "overall_score": data.get("overall_safety_score", 0),
+            "risk_level": data.get("risk_level", ""),
+            "total_flagged": data.get("total_flagged", 0),
+        })
+        await _set_module_progress(job_id, "safety", "completed", 100)
+    except Exception as e:
+        await _set_module_progress(job_id, "safety", "failed", 0, str(e))
+
+
+async def _run_disease_context(job_id: str, proteins: list[str], uniprot_data: dict) -> None:
+    await _set_module_progress(job_id, "disease_context", "running", 0)
+    try:
+        data = await disease_context_svc.fetch_disease_context(proteins, uniprot_data)
+        await _save_result(job_id, "disease_context", data, {
+            "top_disease": data.get("top_disease", ""),
+            "diseases_found": len(data.get("ranked_diseases", [])),
+            "proteins_queried": data.get("proteins_queried", 0),
+        })
+        await _set_module_progress(job_id, "disease_context", "completed", 100)
+    except Exception as e:
+        await _set_module_progress(job_id, "disease_context", "failed", 0, str(e))

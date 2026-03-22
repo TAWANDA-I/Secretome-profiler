@@ -8,10 +8,12 @@ from pydantic import BaseModel, Field
 
 ModuleName = Literal[
     "uniprot", "string", "gprofiler", "hpa", "signalp", "pharos", "sasp", "comparison",
+    "therapeutic", "receptor_ligand", "safety", "disease_context",
 ]
 
 ALL_MODULES: list[str] = [
-    "uniprot", "string", "gprofiler", "hpa", "signalp", "pharos", "sasp",
+    "uniprot", "string", "gprofiler", "hpa", "signalp", "sasp",
+    "therapeutic", "receptor_ligand", "safety", "disease_context",
 ]
 
 
