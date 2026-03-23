@@ -8,20 +8,24 @@ import type { ModuleName } from "@/types";
 const ALL_MODULES: ModuleName[] = [
   "uniprot", "string", "gprofiler", "hpa", "signalp", "sasp",
   "therapeutic", "receptor_ligand", "safety", "disease_context",
+  "pk", "reference_library", "llm_interpretation",
 ];
 
 const MODULE_LABELS: Record<string, string> = {
-  uniprot:         "UniProt Annotation",
-  string:          "STRING Network",
-  gprofiler:       "Functional Enrichment",
-  hpa:             "HPA Concentrations",
-  signalp:         "Signal Peptide",
-  sasp:            "SASP Flagging",
-  comparison:      "Two-Set Comparison",
-  therapeutic:     "Therapeutic Scoring",
-  receptor_ligand: "Receptor-Ligand",
-  safety:          "Safety Profiling",
-  disease_context: "Disease Context",
+  uniprot:           "UniProt Annotation",
+  string:            "STRING Network",
+  gprofiler:         "Functional Enrichment",
+  hpa:               "HPA Concentrations",
+  signalp:           "Signal Peptide",
+  sasp:              "SASP Flagging",
+  comparison:        "Two-Set Comparison",
+  therapeutic:       "Therapeutic Scoring",
+  receptor_ligand:   "Receptor-Ligand",
+  safety:            "Safety Profiling",
+  disease_context:   "Disease Context",
+  pk:                "Pharmacokinetics",
+  reference_library: "Reference Library",
+  llm_interpretation:"AI Interpretation",
 };
 
 const parseProteins = (text: string): string[] =>

@@ -14,7 +14,9 @@ export type ModuleName =
   | "safety"
   | "disease_context"
   | "pk"
-  | "concentrations";
+  | "concentrations"
+  | "reference_library"
+  | "llm_interpretation";
 
 export interface ModuleProgress {
   status: JobStatus;
