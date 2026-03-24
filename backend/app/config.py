@@ -53,9 +53,12 @@ class Settings(BaseSettings):
     opentargets_api_url: str = "https://api.platform.opentargets.org/api/v4/graphql"
     disgenet_api_url: str = "https://www.disgenet.org/api"
 
+    # Auth
+    access_token_expire_hours: int = 24
+
     # LLM / Claude API
     anthropic_api_key: str = ""
-    llm_model: str = "claude-opus-4-5"
+    llm_model: str = "claude-sonnet-4-5"
     llm_enabled: bool = False
 
 

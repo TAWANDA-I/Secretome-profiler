@@ -471,18 +471,21 @@ async def chat_with_results(
     all_results: dict[str, Any],
     history: list[dict],
     user_message: str,
+    api_key: str = "",
 ) -> dict[str, Any]:
     """
     Send a user message in context of secretome results.
     Returns {response, tokens_used, model, error, error_type}.
+    api_key: user's own Anthropic key; falls back to server key.
     """
     settings = get_settings()
+    effective_key = api_key or settings.anthropic_api_key
 
-    if not settings.anthropic_api_key:
+    if not effective_key:
         return {
             "response": (
-                "AI Q&A is not configured. "
-                "Please add ANTHROPIC_API_KEY to backend/.env and restart."
+                "No Anthropic API key available. "
+                "Please add your API key in Settings."
             ),
             "tokens_used": 0,
             "error": True,
@@ -492,7 +495,7 @@ async def chat_with_results(
     try:
         import anthropic as _anthropic  # noqa: PLC0415
 
-        client = _anthropic.Anthropic(api_key=settings.anthropic_api_key)
+        client = _anthropic.Anthropic(api_key=effective_key)
         context = build_context(all_results)
         system = SYSTEM_PROMPT.format(context=context)
 

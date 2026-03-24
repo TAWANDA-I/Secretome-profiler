@@ -13,10 +13,13 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.endpoints.auth import get_optional_user
 from app.database import get_db
 from app.models.job import Job
 from app.models.result import Result
+from app.models.user import User
 from app.services import minio_client
+from app.services.auth import decrypt_api_key
 from app.services.conversation import chat_with_results, generate_suggestions
 
 logger = logging.getLogger(__name__)
@@ -90,6 +93,7 @@ async def chat_about_job(
     job_id: str,
     request: ChatRequest,
     db: AsyncSession = Depends(get_db),
+    current_user: User | None = Depends(get_optional_user),
 ) -> ChatResponse:
     """Send a message about a specific analysis job; returns Claude's response."""
     job = await _get_job_or_404(job_id, db)
@@ -105,11 +109,17 @@ async def chat_about_job(
             error_type="no_results",
         )
 
+    # Use the authenticated user's API key if available
+    api_key = ""
+    if current_user and current_user.anthropic_api_key_encrypted:
+        api_key = decrypt_api_key(current_user.anthropic_api_key_encrypted)
+
     history = [{"role": m.role, "content": m.content} for m in request.history]
     result = await chat_with_results(
         all_results=all_results,
         history=history,
         user_message=request.message,
+        api_key=api_key,
     )
     return ChatResponse(**result)
 
