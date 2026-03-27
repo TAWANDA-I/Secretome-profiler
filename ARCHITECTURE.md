@@ -442,6 +442,8 @@ REFERENCE SECRETOME COMPARISON
 
 `build_context()` in `conversation.py` assembles a longer (~25k token budget) context from all module outputs, with per-section headers. The same context is used for every turn in the conversation — it is not stored server-side.
 
+> **Agent classification:** The Q&A component meets the definition of a conversational agent — it maintains state across turns, has structured access to multi-source data (14 modules), generates context-aware follow-up questions, and grounds responses in job-specific rather than general knowledge. The LLM interpretation is intentionally classified as a pipeline step (single prompt → single response), not an agent.
+
 ### Graceful degradation
 
 When `LLM_ENABLED=false` or `ANTHROPIC_API_KEY` is empty:
@@ -449,12 +451,16 @@ When `LLM_ENABLED=false` or `ANTHROPIC_API_KEY` is empty:
 - `chat_with_results()` returns an error message — the chat panel shows the message
 - All other modules run normally
 
+> **Per-user key architecture:** In the deployed version, each registered user provides their own Anthropic API key rather than using a server-level key. Keys are AES-256 encrypted (Fernet) in PostgreSQL. At job start the key is decrypted and stored in Redis with a 2-hour TTL keyed to the `job_id`. The Celery worker retrieves it from Redis for LLM calls. Plaintext keys exist only in memory during active job execution and are never logged. See `backend/app/services/auth.py`.
+
 ### Token budgeting
 
 | Use case | Typical input tokens | Typical output tokens |
 |---|---|---|
-| Interpretation (15 proteins) | 600–900 | 800–1200 |
-| Q&A chat turn | 1500–4000 | 200–600 |
+| Interpretation (small, <50 proteins) | 2,000–5,000 | 1,500–3,500 |
+| Interpretation (large, 100–500 proteins) | 8,000–20,000 | 2,500–3,500 |
+| Q&A chat turn (with full context) | 8,000–25,000 | 200–800 |
+| Q&A chat (multi-turn, 10 exchanges) | 12,000–30,000 | 200–800 |
 
 ---
 
