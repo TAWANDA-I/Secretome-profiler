@@ -2,6 +2,8 @@
 
 A full-stack bioinformatics platform for comprehensive analysis of cell secretomes. Submit a list of UniProt protein accessions and receive multi-module analysis covering protein annotations, interaction networks, pathway enrichment, secretion classification, pharmacokinetics, therapeutic potential scoring, safety profiling, quantitative concentration analysis, reference secretome comparison, and AI-generated scientific interpretation.
 
+> 🌐 **Deployment:** Coming soon at https://app.leverage.bio (Railway — currently running locally via Docker Compose)
+
 ---
 
 ## Features
@@ -43,6 +45,66 @@ backend ──► PostgreSQL  (job metadata, results index)
 ```
 
 **Seven Docker services:** `postgres`, `redis`, `minio`, `backend`, `worker`, `frontend`, `nginx`
+
+---
+
+## Screenshots
+
+> ⚠️ The app is currently running locally. Public deployment at app.leverage.bio is in progress. All screenshots below are from the local development version.
+
+### Module Pipeline — All 14 modules completing
+
+![Module Progress](docs/screenshots/module_progress.png)
+
+*All 14 analysis modules completing successfully: UniProt Annotation, STRING Network, Functional Enrichment, HPA Concentrations, Signal Peptide, SASP Flagging, Therapeutic Scoring, Receptor-Ligand, Safety, Disease Context, PK Analysis, Reference Library, and LLM Interpretation — in parallel and sequential phases managed by Celery.*
+
+---
+
+### Analysis Summary Dashboard
+
+![Analysis Summary](docs/screenshots/summary.png)
+
+*Summary dashboard for a 216-protein secretome analysis. Top indication: Neuroregeneration (High confidence). Safety Risk: Moderate. 61 receptor-ligand pairs matched. All 9 module cards showing real-time results including STRING network (1,153 edges, 216 nodes), UniProt (216 reviewed proteins), and LLM interpretation enabled via Claude Sonnet 4.5.*
+
+---
+
+### Therapeutic Indication Scoring
+
+![Therapeutic Scoring](docs/screenshots/therapeutic.png)
+
+*Therapeutic indication scoring across 12 categories with safety flags detail. The secretome scores highest for Neuroregeneration. Safety flags shown include Pro-tumorigenic Signals (High) for VEGFA, MDK, SPP1 and MMP2/MMP9, Coagulation Interference (Moderate), and Organ-specific Toxicity (Moderate). Active signaling pathways identified include VEGF, Coagulation, TGFb, Notch, MMP, TIMP, Osteopontin, Midkine, IGFBP, CX3CL1, GPC, MIF, CCL, and Insulin.*
+
+---
+
+### STRING Protein Interaction Network
+
+![Protein Network](docs/screenshots/network.png)
+
+*STRING protein-protein interaction network showing 189 nodes and 1,153 edges at score threshold 600, with 6.5% network density. Hub proteins include INS, SPP1, SAA1, MMP8, AGT, TF, AHSG, SERPINA4, FETUB, CST3, LCN2, GLB1, NR1H4, INSR, and SULT2A1. Interactive Cytoscape.js visualization with adjustable score threshold, gene search, and PNG/CSV export.*
+
+---
+
+### Reference Secretome Library Comparison
+
+![Reference Library](docs/screenshots/reference_library.png)
+
+*Reference secretome comparison of 216 proteins against 12 curated published secretomes. Top match: iPSC-Derived MSC Secretome (12% similarity, Jaccard=0.06), sharing 16 proteins including CLU, CNTF, FRZB, GDF11, GDF15, IGFBP3, IGFBP4, MDK, MMP2, NAMPT, SPP1, THBS1, TIMP1, TIMP2, TXN, and VEGFA. Ranked comparison shows iPSC-MSC, Adipose MSC, Cardiac Progenitor, Hepatocyte, PRP, and Bone Marrow MSC as closest matches.*
+
+---
+
+### AI Scientific Interpretation
+
+![AI Report](docs/screenshots/ai_report.png)
+
+*Claude Sonnet 4.5-powered scientific interpretation report (1,878 tokens). The Executive Summary identifies this as a secretome with pronounced neurogenic and regenerative characteristics driven by GDNF, CNTF, GDF11, MDK, and VEGFA, suggesting a trophic support phenotype with multilineage regenerative capacity. Sections include Mechanistic Insights (neurotrophic signaling via PI3K/AKT and MAPK/ERK), Clinical Relevance (Parkinson's, ALS, spinal cord injury), and recommended next steps.*
+
+---
+
+### Interactive Q&A Research Agent
+
+![Q&A Chat](docs/screenshots/qa_chat.png)
+
+*Multi-turn AI research assistant powered by Claude API, grounded in the specific analysis results of this secretome. Shown: response to "Which are the 10 key factors with the best therapeutic effect?" — the agent identifies VEGFA as top factor with applications across Neuroregeneration, wound healing, cardioprotection, renoprotection, and angiogenesis, noting its BBB limitations. 14,106 tokens used in this session.*
 
 ---
 
@@ -259,6 +321,23 @@ Navigate to **http://localhost:9001** (admin credentials in `.env`)
 ```bash
 docker compose exec postgres psql -U secretome -d secretome_db
 ```
+
+---
+
+## AI Components
+
+SecretomeProfiler integrates Claude at two levels:
+
+| Component | Type | Description |
+|---|---|---|
+| **Q&A Research Agent** | Multi-turn conversational agent | Grounded in 14 module outputs; maintains conversation state; generates context-specific suggested questions from actual findings |
+| **Scientific Report Generator** | Single structured LLM call | 10-section scientific report (executive summary through recommended next steps); generated once per job at pipeline completion |
+
+Both components use `claude-sonnet-4-5` via the Anthropic SDK. Context fed to the Q&A agent is ~15,000–25,000 tokens (all module outputs). Context fed to the report generator is ~2,000–8,000 tokens (compressed summary).
+
+> **Demonstrated in screenshots:** The screenshots above show a real analysis of a 216-protein neurogenic secretome. The AI Interpretation tab shows a Claude-generated report identifying the secretome as having pronounced neurogenic characteristics driven by GDNF, CNTF, GDF11, MDK, and VEGFA. The Q&A agent correctly identified VEGFA as the top therapeutic factor and accurately noted its BBB limitation — demonstrating grounded, data-specific responses rather than generic answers.
+
+See [docs/AI_COMPONENTS.md](docs/AI_COMPONENTS.md) for full technical reference including agent classification rationale, prompt engineering decisions, and per-user API key architecture.
 
 ---
 
