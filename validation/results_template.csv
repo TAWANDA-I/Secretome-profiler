@@ -1,0 +1,58 @@
+Case_ID,Cell_Type,Module,Expected_Value,Actual_Value,Pass_Fail,Notes
+1_MSC_BM,BM-MSC,Top_indication,Immunomodulation,TBD,,
+1_MSC_BM,BM-MSC,Top_indication_score,>60,TBD,,
+1_MSC_BM,BM-MSC,Second_indication,Wound healing / Tissue repair,TBD,,
+1_MSC_BM,BM-MSC,Second_indication_score,>55,TBD,,
+1_MSC_BM,BM-MSC,Safety_level,Low,TBD,,
+1_MSC_BM,BM-MSC,SASP_fraction,<5%,TBD,,
+1_MSC_BM,BM-MSC,Reference_top_match,Bone Marrow MSC reference,TBD,,
+1_MSC_BM,BM-MSC,Reference_jaccard,>0.25,TBD,,
+1_MSC_BM,BM-MSC,Hub_proteins_expected,"FN1,TGFB1,VEGFA,MMP2,HSP90AA1",TBD,,At least 3 of 5 must appear
+1_MSC_BM,BM-MSC,BBB_proteins,IGF1 and/or VEGFA and/or CXCL12,TBD,,
+2_NSC,Neural Stem Cell,Top_indication,Neuroregeneration,TBD,,
+2_NSC,Neural Stem Cell,Top_indication_score,>70,TBD,,
+2_NSC,Neural Stem Cell,Safety_level,Low,TBD,,
+2_NSC,Neural Stem Cell,SASP_fraction,<3%,TBD,,
+2_NSC,Neural Stem Cell,BBB_proteins_found,"BDNF and/or NGF and/or IGF1",TBD,,At least 2 of 3 must be identified
+2_NSC,Neural Stem Cell,Reference_top_match,Neural Stem Cell reference,TBD,,
+2_NSC,Neural Stem Cell,Reference_jaccard,>0.20,TBD,,
+2_NSC,Neural Stem Cell,Hub_proteins_expected,"BDNF,FN1,VEGFA,IGF1,TGFB1",TBD,,At least 3 of 5 must appear
+3_CPC,Cardiac Progenitor,Top_indication,Cardioprotection,TBD,,
+3_CPC,Cardiac Progenitor,Top_indication_score,>60,TBD,,
+3_CPC,Cardiac Progenitor,Second_indication,Angiogenesis,TBD,,
+3_CPC,Cardiac Progenitor,Second_indication_score,>55,TBD,,
+3_CPC,Cardiac Progenitor,Safety_level,Low,TBD,,
+3_CPC,Cardiac Progenitor,SASP_fraction,<5%,TBD,,
+3_CPC,Cardiac Progenitor,Reference_top_match,Cardiac Progenitor reference,TBD,,
+3_CPC,Cardiac Progenitor,Reference_jaccard,>0.20,TBD,,
+4_M2,M2 Macrophage,Top_indication,Anti-inflammatory / Immunomodulation,TBD,,
+4_M2,M2 Macrophage,Top_indication_score,>65,TBD,,
+4_M2,M2 Macrophage,Safety_level,Low,TBD,,
+4_M2,M2 Macrophage,SASP_fraction,<5%,TBD,,
+4_M2,M2 Macrophage,Anti_inflammatory_score,>65,TBD,,Record exact score for contrast
+4_M1,M1 Macrophage,SASP_fraction,>10%,TBD,,IL6+TNF+IL1B+S100A8/9 expected
+4_M1,M1 Macrophage,Safety_level,Moderate,TBD,,Cytokine storm risk expected
+4_M1,M1 Macrophage,Anti_inflammatory_score,<M2 by >15pts,TBD,,Record exact score
+4_CONTRAST,M1_vs_M2,Anti_inflam_score_difference,M2 score MINUS M1 score >= 15,TBD,,CRITICAL - must pass for publication
+5_PRP,Platelet-Rich Plasma,Top_indication,Wound healing,TBD,,
+5_PRP,Platelet-Rich Plasma,Top_indication_score,>65,TBD,,
+5_PRP,Platelet-Rich Plasma,Safety_level,Low,TBD,,
+5_PRP,Platelet-Rich Plasma,SASP_fraction,<5%,TBD,,
+5_PRP,Platelet-Rich Plasma,Coagulation_flag,Present,TBD,,VWF+FGB+SERPINE1 expected
+5_PRP,Platelet-Rich Plasma,Reference_top_match,Platelet releasate reference,TBD,,
+5_PRP,Platelet-Rich Plasma,Reference_jaccard,>0.20,TBD,,
+6_PLASMA,Young Plasma,Top_indication,Anti-senescence,TBD,,
+6_PLASMA,Young Plasma,Top_indication_score,>55,TBD,,
+6_PLASMA,Young Plasma,GDF11_detected_as_driver,Yes,TBD,,Should appear in top drivers
+6_PLASMA,Young Plasma,IGF1_BBB_flagged,Yes,TBD,,IGF1 should be in BBB list
+6_PLASMA,Young Plasma,Safety_level,Low,TBD,,
+6_PLASMA,Young Plasma,SASP_fraction,<5%,TBD,,
+7_NEG,Negative Control,All_indication_scores,All < 20,TBD,,REQUIRED PASS - check each score
+7_NEG,Negative Control,Classical_SP_fraction,<5%,TBD,,Nuclear proteins have no signal peptide
+7_NEG,Negative Control,SASP_fraction,<2%,TBD,,
+7_NEG,Negative Control,Safety_level,Low,TBD,,
+7_NEG,Negative Control,Reference_jaccard_all,<0.05 for all references,TBD,,No close match expected
+SUMMARY,ALL,Cases_1_to_6_pass_rate,>=5 of 6,TBD,,
+SUMMARY,ALL,Case_7_negative_control,PASS,TBD,,Non-negotiable
+SUMMARY,ALL,M1_M2_contrast,PASS,TBD,,Non-negotiable
+SUMMARY,ALL,Overall_validation,PASS if above 3 met,TBD,,
