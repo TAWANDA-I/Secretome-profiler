@@ -20,7 +20,7 @@ target_metadata = Base.metadata
 
 def get_url() -> str:
     from app.config import get_settings
-    return get_settings().database_url
+    return get_settings().async_database_url
 
 
 def run_migrations_offline() -> None:

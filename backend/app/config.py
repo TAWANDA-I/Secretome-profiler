@@ -5,7 +5,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    # PostgreSQL
+    # PostgreSQL — Railway provides DATABASE_URL; local dev uses separate vars
+    database_url: str = ""  # Set by Railway as DATABASE_URL
     postgres_user: str = "secretome"
     postgres_password: str = "secretome_pass"
     postgres_db: str = "secretome_db"
@@ -13,14 +14,24 @@ class Settings(BaseSettings):
     postgres_port: int = 5432
 
     @property
-    def database_url(self) -> str:
+    def async_database_url(self) -> str:
+        if self.database_url:
+            url = self.database_url
+            url = url.replace("postgres://", "postgresql+asyncpg://")
+            url = url.replace("postgresql://", "postgresql+asyncpg://")
+            return url
         return (
             f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
 
     @property
-    def database_url_sync(self) -> str:
+    def sync_database_url(self) -> str:
+        if self.database_url:
+            url = self.database_url
+            url = url.replace("postgres://", "postgresql+psycopg2://")
+            url = url.replace("postgresql://", "postgresql+psycopg2://")
+            return url
         return (
             f"postgresql+psycopg2://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"

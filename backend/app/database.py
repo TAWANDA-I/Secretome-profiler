@@ -10,7 +10,7 @@ settings = get_settings()
 
 # FastAPI app engine — uses connection pool for high throughput
 engine = create_async_engine(
-    settings.database_url,
+    settings.async_database_url,
     echo=settings.debug,
     pool_pre_ping=True,
     pool_size=10,
@@ -27,7 +27,7 @@ AsyncSessionLocal = async_sessionmaker(
 # (pooled asyncpg connections are bound to a specific event loop; Celery creates
 # a new loop per task, causing "Future attached to a different loop" errors)
 worker_engine = create_async_engine(
-    settings.database_url,
+    settings.async_database_url,
     echo=settings.debug,
     poolclass=NullPool,
 )
