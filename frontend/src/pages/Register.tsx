@@ -7,6 +7,7 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -23,7 +24,7 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      const data = await authApi.register(email, password);
+      const data = await authApi.register(email, password, inviteCode);
       storeAuth(data);
       navigate("/settings");
     } catch (err: unknown) {
@@ -104,6 +105,22 @@ export default function Register() {
               placeholder="Repeat your password"
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Invite code
+            </label>
+            <input
+              type="text"
+              value={inviteCode}
+              onChange={(e) => setInviteCode(e.target.value)}
+              placeholder="Enter invite code"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Don't have a code? Email michal@leverage.bio to request access.
+            </p>
           </div>
 
           <button

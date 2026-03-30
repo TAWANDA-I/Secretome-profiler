@@ -56,6 +56,9 @@ class Settings(BaseSettings):
     # Auth
     access_token_expire_hours: int = 24
 
+    # Invite code — leave empty for open registration
+    invite_code: str = ""
+
     # LLM / Claude API
     anthropic_api_key: str = ""
     llm_model: str = "claude-sonnet-4-5"

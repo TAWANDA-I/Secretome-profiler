@@ -35,7 +35,8 @@ export const useJobStore = create<JobStore>((set) => ({
     try {
       const job = await jobsApi.create(payload);
       set((s) => ({
-        jobs: [{ id: job.id, status: job.status, label: job.label,
+        jobs: [{ id: job.id, status: job.status, job_type: job.job_type, label: job.label,
+                  set_a_label: job.set_a_label, set_b_label: job.set_b_label,
                   created_at: job.created_at, updated_at: job.updated_at }, ...s.jobs],
         currentJob: job,
         loading: false,
@@ -54,7 +55,7 @@ export const useJobStore = create<JobStore>((set) => ({
       await jobsApi.delete(id);
     } catch (err) {
       // Roll back on failure
-      set((s) => ({ error: String(err) }));
+      set({ error: String(err) });
       throw err;
     }
   },

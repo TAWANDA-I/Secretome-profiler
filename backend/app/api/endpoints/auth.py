@@ -38,6 +38,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=F
 class RegisterRequest(BaseModel):
     email: str
     password: str
+    invite_code: str = ""
 
 
 class LoginResponse(BaseModel):
@@ -107,6 +108,13 @@ async def get_optional_user(
 
 @router.post("/register", response_model=LoginResponse, status_code=201)
 async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
+    settings = get_settings()
+    if settings.invite_code and req.invite_code != settings.invite_code:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid invite code. Contact michal@leverage.bio to request access.",
+        )
+
     email = req.email.lower().strip()
     if "@" not in email or "." not in email:
         raise HTTPException(status_code=400, detail="Invalid email address")
@@ -123,7 +131,6 @@ async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
     await db.refresh(user)
     logger.info("New user registered: %s", email)
 
-    settings = get_settings()
     token = create_access_token(
         {"sub": user.email}, settings.secret_key, settings.access_token_expire_hours
     )

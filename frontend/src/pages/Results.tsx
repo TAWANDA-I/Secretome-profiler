@@ -80,8 +80,6 @@ export default function Results() {
   const hasPhase2 = results.some((r: Result) => PHASE2_MODULES.has(r.module_name));
   const hasPK = results.some((r: Result) => r.module_name === "pk");
   const hasConcentrations = results.some((r: Result) => r.module_name === "concentrations");
-  const hasReferenceLibrary = results.some((r: Result) => r.module_name === "reference_library");
-  const hasLLM = results.some((r: Result) => r.module_name === "llm_interpretation");
   const phase1Results = results.filter(
     (r: Result) => !PHASE2_MODULES.has(r.module_name) && !PHASE3_MODULES.has(r.module_name)
   );

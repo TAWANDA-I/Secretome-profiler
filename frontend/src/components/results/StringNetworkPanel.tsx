@@ -217,7 +217,7 @@ export function StringNetworkPanel({ result }: Props) {
             "text-halign": "center",
             width: "data(size)",
             height: "data(size)",
-            "font-weight": "600",
+            "font-weight": 600,
             "text-outline-color": "#ffffff",
             "text-outline-width": 1,
           } as cytoscape.Css.Node,
