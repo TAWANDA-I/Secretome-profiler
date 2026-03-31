@@ -17,9 +17,11 @@ class Settings(BaseSettings):
     def async_database_url(self) -> str:
         if self.database_url:
             url = self.database_url
-            url = url.replace("postgres://", "postgresql+asyncpg://")
-            url = url.replace("postgresql://", "postgresql+asyncpg://")
-            return url
+            if url.startswith("postgres://"):
+                return "postgresql+asyncpg://" + url[len("postgres://"):]
+            if url.startswith("postgresql://"):
+                return "postgresql+asyncpg://" + url[len("postgresql://"):]
+            return url  # already has correct driver prefix
         return (
             f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
@@ -29,18 +31,32 @@ class Settings(BaseSettings):
     def sync_database_url(self) -> str:
         if self.database_url:
             url = self.database_url
-            url = url.replace("postgres://", "postgresql+psycopg2://")
-            url = url.replace("postgresql://", "postgresql+psycopg2://")
-            return url
+            if url.startswith("postgres://"):
+                return "postgresql://" + url[len("postgres://"):]
+            return url  # already has correct prefix or is postgresql://
         return (
-            f"postgresql+psycopg2://{self.postgres_user}:{self.postgres_password}"
+            f"postgresql://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
 
-    # Redis / Celery
+    # Redis / Celery — Railway sets REDIS_URL; local dev uses docker-compose service names
     redis_url: str = "redis://redis:6379/0"
-    celery_broker_url: str = "redis://redis:6379/0"
-    celery_result_backend: str = "redis://redis:6379/1"
+    celery_broker_url: str = ""   # falls back to redis_url if not set
+    celery_result_backend: str = ""  # falls back to redis_url/1 if not set
+
+    @property
+    def effective_broker_url(self) -> str:
+        return self.celery_broker_url or self.redis_url
+
+    @property
+    def effective_result_backend(self) -> str:
+        if self.celery_result_backend:
+            return self.celery_result_backend
+        # Use database 1 for results to separate from broker
+        base = self.redis_url
+        if base.endswith("/0"):
+            return base[:-2] + "/1"
+        return base
 
     # MinIO
     minio_endpoint: str = "minio:9000"

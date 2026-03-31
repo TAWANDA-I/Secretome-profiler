@@ -6,8 +6,8 @@ settings = get_settings()
 
 celery_app = Celery(
     "secretome",
-    broker=settings.celery_broker_url,
-    backend=settings.celery_result_backend,
+    broker=settings.effective_broker_url,
+    backend=settings.effective_result_backend,
     include=["app.workers.tasks"],
 )
 
