@@ -37,7 +37,7 @@ def upgrade() -> None:
         ),
         sa.Column(
             "status",
-            sa.Enum("pending", "running", "completed", "failed", name="job_status"),
+            sa.Enum("pending", "running", "completed", "failed", name="job_status", create_type=False),
             nullable=False,
             server_default="pending",
         ),

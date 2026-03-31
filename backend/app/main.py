@@ -6,7 +6,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
 from app.config import get_settings
-from app.database import engine, Base
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -14,13 +13,8 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Create tables on startup (dev only; production uses alembic)
-    # Wrapped in try/except so the app starts even if DB is temporarily unreachable
-    try:
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-    except Exception as e:
-        logger.error(f"Database initialization error (non-fatal): {e}")
+    # Tables are managed by alembic migrations — do not call create_all here.
+    # Run `alembic upgrade head` after first deploy.
     yield
 
 
