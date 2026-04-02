@@ -42,7 +42,11 @@ export default function JobStatus() {
   // WebSocket for real-time updates
   useEffect(() => {
     if (!jobId) return;
-    const ws = new WebSocket(`ws://${window.location.host}/ws/jobs/${jobId}`);
+    const apiUrl = import.meta.env.VITE_API_URL ?? "";
+    const wsBase = apiUrl
+      ? apiUrl.replace("https://", "wss://").replace("http://", "ws://")
+      : `ws://${window.location.host}`;
+    const ws = new WebSocket(`${wsBase}/ws/jobs/${jobId}`);
     wsRef.current = ws;
     ws.onmessage = (event) => {
       try {

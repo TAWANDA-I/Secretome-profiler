@@ -15,7 +15,7 @@ export interface LoginResponse {
 
 export const authApi = {
   register: async (email: string, password: string, inviteCode = ""): Promise<LoginResponse> => {
-    const res = await fetch("/api/v1/auth/register", {
+    const res = await fetch("${import.meta.env.VITE_API_URL ?? ""}/api/v1/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, invite_code: inviteCode }),
@@ -31,7 +31,7 @@ export const authApi = {
     const form = new FormData();
     form.append("username", email);
     form.append("password", password);
-    const res = await fetch("/api/v1/auth/login", { method: "POST", body: form });
+    const res = await fetch("${import.meta.env.VITE_API_URL ?? ""}/api/v1/auth/login", { method: "POST", body: form });
     if (!res.ok) {
       const err = await res.json();
       throw new Error(err.detail || "Login failed");
@@ -41,7 +41,7 @@ export const authApi = {
 
   getMe: async (): Promise<AuthUser> => {
     const token = localStorage.getItem("secretome_token");
-    const res = await fetch("/api/v1/auth/me", {
+    const res = await fetch("${import.meta.env.VITE_API_URL ?? ""}/api/v1/auth/me", {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) throw new Error("Not authenticated");
@@ -50,7 +50,7 @@ export const authApi = {
 
   saveApiKey: async (key: string): Promise<void> => {
     const token = localStorage.getItem("secretome_token");
-    const res = await fetch("/api/v1/auth/api-key", {
+    const res = await fetch("${import.meta.env.VITE_API_URL ?? ""}/api/v1/auth/api-key", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export const authApi = {
 
   deleteApiKey: async (): Promise<void> => {
     const token = localStorage.getItem("secretome_token");
-    await fetch("/api/v1/auth/api-key", {
+    await fetch("${import.meta.env.VITE_API_URL ?? ""}/api/v1/auth/api-key", {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
