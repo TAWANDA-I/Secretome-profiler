@@ -42,7 +42,8 @@ export default function SecretomeChat({ jobId }: SecretomeChatProps) {
   const loadSuggestions = async () => {
     setSuggestionsLoading(true);
     try {
-      const res = await fetch(`/api/v1/conversations/${jobId}/suggestions`);
+      const base = import.meta.env.VITE_API_URL ?? "";
+      const res = await fetch(`${base}/api/v1/conversations/${jobId}/suggestions`);
       if (res.ok) {
         const data = await res.json();
         setSuggestions(data.suggestions || []);
@@ -71,7 +72,8 @@ export default function SecretomeChat({ jobId }: SecretomeChatProps) {
     const history = messages.map((m) => ({ role: m.role, content: m.content }));
 
     try {
-      const res = await fetch(`/api/v1/conversations/${jobId}`, {
+      const base = import.meta.env.VITE_API_URL ?? "";
+      const res = await fetch(`${base}/api/v1/conversations/${jobId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text.trim(), history }),

@@ -250,7 +250,8 @@ function PDFDownloadButton({ jobId }: { jobId: string }) {
   const handleDownload = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/v1/results/job/${jobId}/report.pdf`);
+      const base = import.meta.env.VITE_API_URL ?? "";
+      const response = await fetch(`${base}/api/v1/results/job/${jobId}/report.pdf`);
       if (!response.ok) throw new Error("PDF generation failed");
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
