@@ -37,7 +37,10 @@ export default function JobStatus() {
     enabled: !!jobId,
   });
 
-  const job = wsJob ?? httpJob;
+  // Merge WS partial updates (status, progress) onto the full HTTP job object
+  const job: Job | undefined = httpJob
+    ? { ...httpJob, ...(wsJob ?? {}) }
+    : undefined;
 
   // WebSocket for real-time updates
   useEffect(() => {
@@ -53,7 +56,8 @@ export default function JobStatus() {
       try {
         const data = JSON.parse(event.data);
         if (data.error) return;
-        setWsJob((prev) => ({ ...(prev ?? {}), ...data }));
+        // WS sends { job_id, status, progress } — store only those fields
+        setWsJob({ status: data.status, progress: data.progress } as Job);
       } catch {}
     };
     ws.onerror = () => ws.close();
@@ -116,7 +120,7 @@ export default function JobStatus() {
       <div className="flex gap-3">
         {job.status === "completed" && (
           <Button onClick={() => navigate(
-            job.job_type === "comparison" ? `/comparison/${job.id}` : `/results/${job.id}`
+            job.job_type === "comparison" ? `/comparison/${jobId}` : `/results/${jobId}`
           )}>
             View Results
           </Button>
