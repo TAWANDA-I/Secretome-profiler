@@ -415,7 +415,7 @@ async def _run_llm_interpretation(
             concentration_data=concentration_data,
             reference_library_data=reference_library_data,
         )
-        data = generate_interpretation(context, settings)
+        data = generate_interpretation(context, get_settings())
         await _save_result(job_id, "llm_interpretation", data, {
             "enabled": data.get("enabled", False),
             "model": data.get("model", ""),
