@@ -21,7 +21,8 @@ def _store_job_api_key(job_id: str, api_key: str) -> None:
     try:
         import redis as redis_lib
         from app.config import get_settings
-        r = redis_lib.from_url(get_settings().redis_url)
+        # Use effective_broker_url which resolves REDIS_URL from environment
+        r = redis_lib.from_url(get_settings().effective_broker_url)
         r.setex(f"job_api_key:{job_id}", 7200, api_key)
     except Exception as exc:
         import logging
@@ -74,7 +75,10 @@ async def _create_single_job(payload: JobCreate, db: AsyncSession) -> Job:
     db.add(job)
     await db.flush()
     await db.refresh(job)
-    run_analysis_pipeline.delay(str(job.id))
+    job_id = str(job.id)
+    # Commit BEFORE dispatching to Celery — worker must be able to SELECT the row
+    await db.commit()
+    run_analysis_pipeline.delay(job_id)
     return job
 
 
@@ -110,7 +114,10 @@ async def _create_comparison_job(payload: JobCreate, db: AsyncSession) -> Job:
     db.add(job)
     await db.flush()
     await db.refresh(job)
-    run_comparison_pipeline.delay(str(job.id))
+    job_id = str(job.id)
+    # Commit BEFORE dispatching to Celery — worker must be able to SELECT the row
+    await db.commit()
+    run_comparison_pipeline.delay(job_id)
     return job
 
 
