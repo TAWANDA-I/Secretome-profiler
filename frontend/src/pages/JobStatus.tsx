@@ -42,6 +42,14 @@ export default function JobStatus() {
     ? { ...httpJob, ...(wsJob ?? {}) }
     : undefined;
 
+  // Auto-redirect when job completes — uses jobId from URL, never from job object
+  useEffect(() => {
+    if (!jobId || jobId === "undefined") return;
+    if (job?.status === "completed") {
+      navigate(job.job_type === "comparison" ? `/comparison/${jobId}` : `/results/${jobId}`, { replace: true });
+    }
+  }, [job?.status, job?.job_type, jobId, navigate]);
+
   // WebSocket for real-time updates
   useEffect(() => {
     if (!jobId) return;
