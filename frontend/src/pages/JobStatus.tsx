@@ -46,7 +46,8 @@ export default function JobStatus() {
     const wsBase = apiUrl
       ? apiUrl.replace("https://", "wss://").replace("http://", "ws://")
       : `ws://${window.location.host}`;
-    const ws = new WebSocket(`${wsBase}/ws/jobs/${jobId}`);
+    const token = localStorage.getItem("secretome_token");
+    const ws = new WebSocket(`${wsBase}/api/v1/ws/jobs/${jobId}?token=${token}`);
     wsRef.current = ws;
     ws.onmessage = (event) => {
       try {
